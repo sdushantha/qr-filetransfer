@@ -31,8 +31,13 @@ def start_server(file):
     if os.path.isdir(file):
         zip_name = file.split("/")
         zip_name = zip_name[-2]
-        path_to_zip = make_archive(zip_name, "zip", file)
-        file = path_to_zip.replace(os.getcwd(), "")
+        try:
+            path_to_zip = make_archive(zip_name, "zip", file)
+            file = path_to_zip.replace(os.getcwd(), "")
+        except PermissionError:
+            print("PermissionError: Try with sudo")
+            exit()  
+        
 
     handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(("", int(PORT)), handler)
