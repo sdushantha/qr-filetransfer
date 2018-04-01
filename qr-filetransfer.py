@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import qrcode
 import http.server
 import socketserver
@@ -7,7 +9,6 @@ import socket
 import argparse
 import sys
 from shutil import make_archive
-
 
 
 def get_local_ip():
@@ -31,6 +32,7 @@ def start_server(file):
     if os.path.isdir(file):
         zip_name = file.split("/")
         zip_name = zip_name[-2]
+
         try:
             path_to_zip = make_archive(zip_name, "zip", file)
             file = path_to_zip.replace(os.getcwd(), "")
@@ -40,8 +42,14 @@ def start_server(file):
         
 
     handler = http.server.SimpleHTTPRequestHandler
-    httpd = socketserver.TCPServer(("", int(PORT)), handler)
-    address = "http://"+str(LOCAL_IP)+":"+str(PORT)+"/"+file
+
+    try:
+        httpd = socketserver.TCPServer(("", int(PORT)), handler)
+    except:
+        # An error sometimes occurs randomly. 
+        print("Error: Please try again")
+
+    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file
 
     print("Scan the following QR to start downloading.\nMake sure that your smartphone is connected to the same WiFi network as this computer.")
     make_qr(address)
@@ -66,7 +74,7 @@ def main():
 	args = parser.parse_args()
 
 
-	if len(sys.argv) == 1: # if argument is given then show help
+	if len(sys.argv) == 1:
 		parser.print_help()
 
 	elif args.file:
