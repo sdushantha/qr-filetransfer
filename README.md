@@ -18,6 +18,7 @@ usage: qr-filetransfer.py [-h] -f FILE
 
 **Note:** Both devices needs to be connected to the same network
 
+---
 
 Transfer a single file
 ```bash
