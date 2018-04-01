@@ -1,5 +1,5 @@
 # qr-filetransfer
-
+> Transfer files over WiFI from your computer to your smartphone from the terminal
 ## Installation
 
 ```bash
