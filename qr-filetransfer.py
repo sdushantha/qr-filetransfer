@@ -2,15 +2,12 @@ import qrcode
 import http.server
 import socketserver
 import random
-from os import system, chdir
+import os
 import socket
 import argparse
 import sys
+from shutil import make_archive
 
-
-white_block = '\033[0;37;47m  '
-black_block = '\033[0;37;40m  '
-new_line = '\033[0m\n'
 
 
 def get_local_ip():
@@ -28,8 +25,14 @@ def start_server(file):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
     
-    if "/" in file:
-    	chdir("/")
+    if file.startswith("/"):
+    	os.chdir("/")
+
+    if os.path.isdir(file):
+        zip_name = file.split("/")
+        zip_name = zip_name[-2]
+        path_to_zip = make_archive(zip_name, "zip", file)
+        file = path_to_zip.replace(os.getcwd(), "")
 
     handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(("", int(PORT)), handler)
@@ -37,28 +40,15 @@ def start_server(file):
 
     print("Scan the following QR to start downloading.\nMake sure that your smartphone is connected to the same WiFi network as this computer.")
     make_qr(address)
-    ser = httpd.serve_forever()
+    httpd.serve_forever()
 
 
-# It works yay :)
 def make_qr(address):
     qr = qrcode.QRCode(1)
     qr.add_data(address)
     qr.make()
-    output = white_block*(qr.modules_count+2) + new_line
-    for mn in qr.modules:
-        output += white_block
-        for m in mn:
-            if m:
-                output += black_block
-            else:
-                output += white_block
-        output += white_block + new_line
-    output += white_block*(qr.modules_count+2) + new_line
-    print(output)
+    qr.print_tty()
 
-#file = input("FILE: ")
-#start_server(file=file)
 
 def main():
 	parser = argparse.ArgumentParser(description = "Transfer files over wifi from your computer to your mobile device by scanning a QR code without leaving the terminal.")
