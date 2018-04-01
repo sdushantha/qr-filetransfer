@@ -12,13 +12,16 @@
 
 
 ## Usage
+**Note:** Both devices needs to be connected to the same network
+
+
 Transfer a single file
 ```bash
 python3 qr-filetransfer.py -f /path/to/file.txt
 ```
 
 
-Transfer a full directory. Note: the **directory gets zipped** before being transferred
+Transfer a full directory. **Note:** the directory gets zipped before being transferred
 ```bash
 python3 qr-filetransfer.py -f /path/to/directory
 ```
