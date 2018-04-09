@@ -1,5 +1,5 @@
 # qr-filetransfer
-> Transfer files over WiFI from your computer to your smartphone from the terminal
+> Transfer files over WiFi from your computer to your smartphone from the terminal
 
 [![asciicast](https://asciinema.org/a/173861.png)](https://asciinema.org/a/173861)
 
@@ -33,3 +33,9 @@ Transfer a full directory. **Note:** the directory gets zipped before being tran
 ```bash
 python3 qr-filetransfer.py -f /path/to/directory/
 ```
+
+
+## License
+MIT License
+
+Copyright (c) 2018 Siddharth Dushantha
