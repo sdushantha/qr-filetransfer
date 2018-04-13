@@ -1,4 +1,3 @@
 I will be putting things that I need to do and some notes
 
-[1] Fix issue where the whole computer can be accessed
-[2] Add a -zip arggumet to zip a file if user wants to
+[1] Add a -zip arggumet to zip a file if user wants to
