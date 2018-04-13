@@ -21,6 +21,10 @@ usage: qr-filetransfer.py [-h] -f FILE
 
 **Note:** Both devices needs to be connected to the same network
 
+**Exiting**
+
+To exit the program, just press ```CTRL+C```. **Dont** press ```CTRL+Z```.
+
 ---
 
 Transfer a single file
