@@ -18,8 +18,7 @@ def get_local_ip():
 
 
 def random_port():
-	port = random.random()
-	return str(port)[5:9]
+    return random.randint(1024, 65535)
 
 
 def start_server(fname):
@@ -30,7 +29,7 @@ def start_server(fname):
     
     # Checking if given fname is a path
     if fname.startswith("/"):
-    	os.chdir("/")
+        os.chdir("/")
     # Checking if given file name or path is a directory
     if os.path.isdir(fname):
         zip_name = pathlib.PurePosixPath(fname).name
@@ -61,13 +60,7 @@ def start_server(fname):
     os.chdir(TEMP_DIR_NAME)
 
     handler = http.server.SimpleHTTPRequestHandler
-
-    try:
-        httpd = socketserver.TCPServer(("", int(PORT)), handler)
-        
-    except PermissionError:
-        # An error sometimes occurs randomly. 
-        print("Error: Please try again")
+    httpd = socketserver.TCPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
