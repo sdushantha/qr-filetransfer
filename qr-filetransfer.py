@@ -8,7 +8,7 @@ import os
 import socket
 import argparse
 import sys
-from shutil import make_archive, move, rmtree
+from shutil import make_archive, move, rmtree, copy2
 import pathlib
 
 def get_local_ip():
@@ -51,7 +51,7 @@ def start_server(fname):
     
     try:
         # Move the file to .tmpqr
-        move(fname, TEMP_DIR_NAME)
+        copy2(fname, TEMP_DIR_NAME)
     except FileNotFoundError:
         print("File not found!")
         rmtree(TEMP_DIR_NAME)
