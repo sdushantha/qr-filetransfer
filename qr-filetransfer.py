@@ -27,7 +27,7 @@ def start_server(fname):
     # Using .tmpqr since .tmp is very common
     TEMP_DIR_NAME = ".tmp_qr"
 
-    # Variable to mark zip for deletion, of the user supplies a folder
+    # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
 
     # Checking if given fname is a path
