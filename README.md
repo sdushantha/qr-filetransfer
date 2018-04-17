@@ -38,6 +38,8 @@ Transfer a full directory. **Note:** the directory gets zipped before being tran
 python3 qr-filetransfer.py -f /path/to/directory/
 ```
 
+## Credits
+Inspired by the Go project [qr-filetransfer](https://github.com/claudiodangelis/qr-filetransfer)
 
 ## License
 MIT License
