@@ -76,11 +76,11 @@ def start_server(fname):
     except KeyboardInterrupt:
         os.chdir("..")
         rmtree(TEMP_DIR_NAME)
-	# If the user sent a directory, a zip was created and then copied to the temporary directory, this deletes the first created zip
-	if delete_zip != 0:
-	    os.remove(delete_zip)
-        print("\nExiting...")
-        sys.exit()
+    # If the user sent a directory, a zip was created and then copied to the temporary directory, this deletes the first created zip
+    if delete_zip != 0:
+        os.remove(delete_zip)
+    print("\nExiting...")
+    sys.exit()
 
 def print_qr_code(address):
     qr = qrcode.QRCode(1)
