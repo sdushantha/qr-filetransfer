@@ -26,7 +26,10 @@ def start_server(fname):
     LOCAL_IP = get_local_ip()
     # Using .tmpqr since .tmp is very common
     TEMP_DIR_NAME = ".tmp_qr"
-    
+
+    # Variable to mark zip for deletion, if the user uses a folder as an argument
+    delete_zip = 0
+
     # Checking if given fname is a path
     if fname.startswith("/"):
         os.chdir("/")
@@ -40,6 +43,7 @@ def start_server(fname):
             fname = path_to_zip.replace(os.getcwd(), "")
             # The above line replacement leaves a / infront of the file name
             fname = fname.replace("/", "")
+	    delete_zip = fname
             print(fname)
         except PermissionError:
             print("PermissionError: Try with sudo")
@@ -72,8 +76,11 @@ def start_server(fname):
     except KeyboardInterrupt:
         os.chdir("..")
         rmtree(TEMP_DIR_NAME)
-        print("\nExiting...")
-        sys.exit()
+    # If the user sent a directory, a zip was created and then copied to the temporary directory, this deletes the first created zip
+    if delete_zip != 0:
+        os.remove(delete_zip)
+    print("\nExiting...")
+    sys.exit()
 
 def print_qr_code(address):
     qr = qrcode.QRCode(1)
