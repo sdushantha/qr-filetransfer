@@ -23,7 +23,7 @@ usage: qr-filetransfer.py [-h] -f FILE
 
 **Exiting**
 
-To exit the program, just press ```CTRL+C```. **Dont** press ```CTRL+Z```.
+To exit the program, just press ```CTRL+C```.
 
 ---
 
