@@ -10,6 +10,7 @@ import argparse
 import sys
 from shutil import make_archive, move, rmtree, copy2
 import pathlib
+import signal
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -43,8 +44,7 @@ def start_server(fname):
             fname = path_to_zip.replace(os.getcwd(), "")
             # The above line replacement leaves a / infront of the file name
             fname = fname.replace("/", "")
-	    delete_zip = fname
-            print(fname)
+            delete_zip = fname
         except PermissionError:
             print("PermissionError: Try with sudo")
             sys.exit()
@@ -90,6 +90,8 @@ def print_qr_code(address):
 
 
 def main():
+    # This disables CTRL+Z while the script is running
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
     parser = argparse.ArgumentParser(description = "Transfer files over WiFi from your computer to your mobile device by scanning a QR code without leaving the terminal.")
 
     parser.add_argument("-f", "--file",
