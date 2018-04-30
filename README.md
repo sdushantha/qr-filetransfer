@@ -3,7 +3,7 @@
 
 [![asciicast](https://asciinema.org/a/173861.png)](https://asciinema.org/a/173861)
 
-## Installation
+## :floppy_disk: Installation
 
 ```bash
 # clone the repo
@@ -14,7 +14,7 @@
 ```
 
 
-## Usage
+## :hammer: Usage
 ```
 usage: qr-filetransfer.py [-h] -f FILE
 ```
@@ -38,10 +38,10 @@ Transfer a full directory. **Note:** the directory gets zipped before being tran
 python3 qr-filetransfer.py -f /path/to/directory/
 ```
 
-## Credits
+## :rocket: Credits
 Inspired by the Go project [qr-filetransfer](https://github.com/claudiodangelis/qr-filetransfer)
 
-## License
+## :scroll: License
 MIT License
 
 Copyright (c) 2018 Siddharth Dushantha
