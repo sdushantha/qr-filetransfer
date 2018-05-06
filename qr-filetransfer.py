@@ -26,7 +26,8 @@ def start_server(fname):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
     # Using .tmpqr since .tmp is very common
-    TEMP_DIR_NAME = ".tmp_qr"
+    #create the .tmp_qr folder in /tmp file of unix system 
+    TEMP_DIR_NAME = "/tmp/.tmp_qr" 
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
@@ -50,8 +51,11 @@ def start_server(fname):
             sys.exit()
 
     # Makes a directory name .tmpqr and stores the file there
-    os.makedirs(TEMP_DIR_NAME)
-    
+    try:
+        os.makedirs(TEMP_DIR_NAME)
+    except:
+        print("Directory already exist") # preventing directory already exist crash..
+
     try:
         # Move the file to .tmpqr
         copy2(fname, TEMP_DIR_NAME)
@@ -65,6 +69,11 @@ def start_server(fname):
 
     handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(("", PORT), handler)
+    
+    # tweaking fname to make a perfect url
+    fname = fname.split('/')
+    fname = fname[-1]
+    fname = fname.replace(" ", "%20")
 
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
@@ -83,7 +92,10 @@ def start_server(fname):
     sys.exit()
 
 def print_qr_code(address):
-    qr = qrcode.QRCode(1)
+    qr = qrcode.QRCode(version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,)
     qr.add_data(address)
     qr.make()
     qr.print_tty()
