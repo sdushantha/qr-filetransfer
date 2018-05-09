@@ -6,7 +6,6 @@ import socketserver
 import random
 import os
 import socket
-import argparse
 import sys
 from shutil import make_archive, move, rmtree, copy2
 import pathlib
@@ -35,6 +34,7 @@ def start_server(fname):
     # Checking if given fname is a path
     if fname.startswith("/"):
         os.chdir("/")
+
     # Checking if given file name or path is a directory
     if os.path.isdir(fname):
         zip_name = pathlib.PurePosixPath(fname).name
@@ -47,10 +47,10 @@ def start_server(fname):
             fname = fname.replace("/", "")
             delete_zip = fname
         except PermissionError:
-            print("PermissionError: Try with sudo")
+            print("Try with sudo")
             sys.exit()
 
-    # Makes a directory name .tmpqr and stores the file there
+    # Makes a directory name .tmp_qr and stores the file there
     try:
         os.makedirs(TEMP_DIR_NAME)
     except:
@@ -80,6 +80,7 @@ def start_server(fname):
 
     print("Scan the following QR to start downloading.\nMake sure that your smartphone is connected to the same WiFi network as this computer.")
     print_qr_code(address)
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -88,6 +89,7 @@ def start_server(fname):
     # If the user sent a directory, a zip was created and then copied to the temporary directory, this deletes the first created zip
     if delete_zip != 0:
         os.remove(delete_zip)
+
     print("\nExiting...")
     sys.exit()
 
@@ -104,22 +106,13 @@ def print_qr_code(address):
 def main():
     # This disables CTRL+Z while the script is running
     signal.signal(signal.SIGTSTP, signal.SIG_IGN)
-    parser = argparse.ArgumentParser(description = "Transfer files over WiFi from your computer to your mobile device by scanning a QR code without leaving the terminal.")
-
-    parser.add_argument("-f", "--file",
-			required=True,
-			help="File to be shared")
-
-    args = parser.parse_args()
 
     # If no argument is given or invalid agrument then it shows help
     if len(sys.argv) == 1:
-        parser.print_help()
         sys.exit()
 
-
-    start_server(fname=args.file)
-
+    if sys.argv[1]:
+        start_server(fname=sys.argv[1])
 
 if __name__=="__main__":
 	main()
