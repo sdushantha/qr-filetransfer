@@ -1,3 +1,0 @@
-I will be putting things that I need to do and some notes
-
-[1] Add a -zip arggumet to zip a file if user wants to
