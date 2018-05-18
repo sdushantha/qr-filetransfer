@@ -7,16 +7,16 @@
 
 ```bash
 # clone the repo
-> git clone https://github.com/sdushantha/qr-filetransfer.git
+$ git clone https://github.com/sdushantha/qr-filetransfer.git
 
 # install the requirements
-> pip3 install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 
 
 ## :hammer: Usage
 ```
-usage: qr-filetransfer.py [-h] -f FILE
+usage: qr-filetransfer.py [-h] FILE
 ```
 
 **Note:** Both devices needs to be connected to the same network
@@ -29,13 +29,13 @@ To exit the program, just press ```CTRL+C```.
 
 Transfer a single file
 ```bash
-python3 qr-filetransfer.py /path/to/file.txt
+$ python3 qr-filetransfer.py /path/to/file.txt
 ```
 
 
 Transfer a full directory. **Note:** the directory gets zipped before being transferred
 ```bash
-python3 qr-filetransfer.py /path/to/directory/
+$ python3 qr-filetransfer.py /path/to/directory/
 ```
 
 ## :rocket: Credits
