@@ -12,16 +12,20 @@ import pathlib
 import signal
 
 def get_local_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    return s.getsockname()[0]
+    try: 
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except OSError:
+        print("Network is unreachable")
+        sys.exit()
 
 
 def random_port():
     return random.randint(1024, 65535)
 
 
-def start_server(fname):
+def start_server(fname, cwd):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
     # Using .tmpqr since .tmp is very common
@@ -47,7 +51,7 @@ def start_server(fname):
             fname = fname.replace("/", "")
             delete_zip = fname
         except PermissionError:
-            print("Try with sudo")
+            print("Permission denied")
             sys.exit()
 
     # Makes a directory name .tmp_qr and stores the file there
@@ -60,7 +64,7 @@ def start_server(fname):
         # Move the file to .tmpqr
         copy2(fname, TEMP_DIR_NAME)
     except FileNotFoundError:
-        print("File not found!")
+        print("No such file or directory")
         rmtree(TEMP_DIR_NAME)
         sys.exit()
 
@@ -86,11 +90,18 @@ def start_server(fname):
     except KeyboardInterrupt:
         os.chdir("..")
         rmtree(TEMP_DIR_NAME)
-    # If the user sent a directory, a zip was created and then copied to the temporary directory, this deletes the first created zip
-    if delete_zip != 0:
-        os.remove(delete_zip)
 
-    print("\nExiting...")
+    # If the user sent a directory, a zip was created and then copied to the 
+    # temporary directory, this deletes the first created zip
+    if delete_zip != 0:
+
+        # Goes back to the dir where the qr-filetransfer was ran
+        # to delete the zip
+        os.chdir(cwd)
+        os.remove(delete_zip)
+    # Just being nice not messing up your bash prompt :)
+    print("")
+    
     sys.exit()
 
 def print_qr_code(address):
@@ -106,13 +117,16 @@ def print_qr_code(address):
 def main():
     # This disables CTRL+Z while the script is running
     signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+    
+    # To change back to this dir 
+    CURRENT_DIR = os.getcwd()
 
     # If no argument is given or invalid agrument then it shows help
     if len(sys.argv) == 1:
         sys.exit()
 
     if sys.argv[1]:
-        start_server(fname=sys.argv[1])
+        start_server(fname=sys.argv[1], cwd=CURRENT_DIR)
 
 if __name__=="__main__":
 	main()
