@@ -11,6 +11,7 @@ from shutil import make_archive, move, rmtree, copy2
 import pathlib
 import signal
 
+
 def get_local_ip():
     try: 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -122,7 +123,8 @@ def main():
     CURRENT_DIR = os.getcwd()
 
     # If no argument is given or invalid agrument then it shows help
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help"]:
+        print("usage: qr-filetransfer.py [-h] FILE")
         sys.exit()
 
     if sys.argv[1]:
