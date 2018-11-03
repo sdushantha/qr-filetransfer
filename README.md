@@ -9,6 +9,9 @@
 # clone the repo
 $ git clone https://github.com/sdushantha/qr-filetransfer.git
 
+# change the working directory to qr-filetransfer
+$ cd qr-filetransfer
+
 # install the requirements
 $ pip3 install -r requirements.txt
 ```
