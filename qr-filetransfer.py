@@ -10,6 +10,12 @@ import sys
 from shutil import make_archive, move, rmtree, copy2
 import pathlib
 import signal
+from subprocess import Popen, PIPE
+
+
+def get_ssid():
+	proc = Popen(["iwgetid", "-r"], stdout=PIPE)
+	return proc.communicate()[0].strip().decode()
 
 
 def get_local_ip():
@@ -29,6 +35,8 @@ def random_port():
 def start_server(fname, cwd):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
+    SSID = get_ssid()
+
     # Using .tmpqr since .tmp is very common
     #create the .tmp_qr folder in /tmp file of unix system 
     TEMP_DIR_NAME = "/tmp/.tmp_qr" 
@@ -83,7 +91,7 @@ def start_server(fname, cwd):
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
 
-    print("Scan the following QR to start downloading.\nMake sure that your smartphone is connected to the same WiFi network as this computer.")
+    print("Scan the following QR to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
     print_qr_code(address)
 
     try:
