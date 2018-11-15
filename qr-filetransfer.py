@@ -10,12 +10,27 @@ import sys
 from shutil import make_archive, move, rmtree, copy2
 import pathlib
 import signal
-from subprocess import Popen, PIPE
+import platform
 
+MacOS = "Darwin"
 
 def get_ssid():
-	proc = Popen(["iwgetid", "-r"], stdout=PIPE)
-	return proc.communicate()[0].strip().decode()
+    operating_system = platform.system()
+
+    if operating_system == MacOS:
+        ssid = os.popen("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk '/ SSID/ {print substr($0, index($0, $2))}'").read().strip()
+        return ssid
+    
+    elif operating_system == "Linux":
+       ssid = os.popen("iwgetid -r")
+       return ssid
+
+    else:
+        # I dont know how to get the current SSID on Windows. I will have to make
+        # Windows VM and test on it. Or someone with a Windows computer
+        # can help me :)
+        ssid = "the same WiFi network as this computer"
+        return ssid
 
 
 def get_local_ip():
