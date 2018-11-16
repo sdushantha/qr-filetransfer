@@ -5,13 +5,15 @@
 
 ## 💾 Installation
 
+You will find the most updated version of ```qr-filetransfer``` here. But if you want the most stable version, use ```pip``` to install it
+
 ### Pip Install
 
-**Global Install**
+Global Install
 
 ```pip install qr-filetransfer```
 
-**Local Install**
+Local Install
 
 ```pip install --user qr-filetransfer```
 
