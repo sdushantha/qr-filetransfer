@@ -12,10 +12,14 @@ import pathlib
 import signal
 import platform
 
+
 MacOS = "Darwin"
+Linux = "Linux"
+Windows = "Windows"
+operating_system = platform.system()
+
 
 def get_ssid():
-    operating_system = platform.system()
 
     if operating_system == MacOS:
         ssid = os.popen("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk '/ SSID/ {print substr($0, index($0, $2))}'").read().strip()
@@ -26,7 +30,7 @@ def get_ssid():
        return ssid
 
     else:
-        # list interface information and extract the SSID from Profile
+        # List interface information and extract the SSID from Profile
         # note that if WiFi is not connected, Profile line will not be found and nothing will be returned.
         interface_info = os.popen("netsh wlan show interfaces").read()
         for line in interface_info.splitlines():
@@ -100,7 +104,7 @@ def start_server(fname, cwd):
     handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(("", PORT), handler)
     
-    # tweaking fname to make a perfect url
+    # Tweaking fname to make a perfect url
     fname = fname.split('/')
     fname = fname[-1]
     fname = fname.replace(" ", "%20")
@@ -137,15 +141,23 @@ def print_qr_code(address):
                 border=4,)
     qr.add_data(address)
     qr.make()
-    qr.print_tty()
+
+    if operating_system != Windows:
+        # According to gomercin on GitHub, print_tty
+        # prints out glibberish
+        qr.print_tty()
+
+    else:
+        qr.print_ascii()
 
 
 def main():
-    if platform.system() != "Windows":
+    if operating_system != Windows:
+        # SIGSTP does not work in Windows
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
     
-    # To change back to this dir 
+    # So that we can come back to this dir 
     CURRENT_DIR = os.getcwd()
 
     # If no argument is given or invalid agrument then it shows help
