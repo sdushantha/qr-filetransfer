@@ -17,11 +17,11 @@ You will find the most updated version of ```qr-filetransfer``` here. But if you
 
 Global Install
 
-```pip install qr-filetransfer```
+```pip3 install qr-filetransfer```
 
 Local Install
 
-```pip install --user qr-filetransfer```
+```pip3 install --user qr-filetransfer```
 
 ### Git Install
 
@@ -39,7 +39,7 @@ $ pip3 install -r requirements.txt
 
 ## 🔨 Usage
 ```
-usage: qr-filetransfer.py [-h] FILE
+usage: qr-filetransfer [-h] FILE
 ```
 
 **Note:** Both devices needs to be connected to the same network
@@ -52,13 +52,13 @@ To exit the program, just press ```CTRL+C```.
 
 Transfer a single file
 ```bash
-$ python3 qr-filetransfer.py /path/to/file.txt
+$ qr-filetransfer /path/to/file.txt
 ```
 
 
 Transfer a full directory. **Note:** the directory gets zipped before being transferred
 ```bash
-$ python3 qr-filetransfer.py /path/to/directory/
+$ qr-filetransfer /path/to/directory/
 ```
 
 ## 🌟 Credits
