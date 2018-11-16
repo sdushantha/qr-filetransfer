@@ -5,6 +5,18 @@
 
 ## 💾 Installation
 
+### Pip Install
+
+**Global Install**
+
+```pip install qr-filetransfer```
+
+**Local Install**
+
+```pip install --user qr-filetransfer```
+
+### Git Install
+
 ```bash
 # clone the repo
 $ git clone https://github.com/sdushantha/qr-filetransfer.git
