@@ -22,7 +22,7 @@ def get_ssid():
         return ssid
     
     elif operating_system == "Linux":
-       ssid = os.popen("iwgetid -r")
+       ssid = os.popen("iwgetid -r").read().strip()
        return ssid
 
     else:
