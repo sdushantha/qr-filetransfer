@@ -7,7 +7,7 @@ import random
 import os
 import socket
 import sys
-from shutil import make_archive, move, rmtree, copy2
+from shutil import make_archive, rmtree, copy2
 import pathlib
 import signal
 import platform
@@ -144,7 +144,10 @@ def print_qr_code(address):
 
     if operating_system != Windows:
         # According to gomercin on GitHub, print_tty
-        # prints out glibberish
+        # prints out gibberish.
+        # print_tty() shows a better looking QR code.
+        # So thats why I am using print__tty() instead
+        # of print_ascii() for all operating systems
         qr.print_tty()
 
     else:
