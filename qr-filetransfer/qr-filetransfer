@@ -26,11 +26,13 @@ def get_ssid():
        return ssid
 
     else:
-        # I dont know how to get the current SSID on Windows. I will have to make
-        # Windows VM and test on it. Or someone with a Windows computer
-        # can help me :)
-        ssid = "the same WiFi network as this computer"
-        return ssid
+        # list interface information and extract the SSID from Profile
+        # note that if WiFi is not connected, Profile line will not be found and nothing will be returned.
+        interface_info = os.popen("netsh wlan show interfaces").read()
+        for line in interface_info.splitlines():
+            if line.strip().startswith("Profile"):
+                ssid = line.split(':')[1].strip()
+                return ssid
 
 
 def get_local_ip():
@@ -139,8 +141,9 @@ def print_qr_code(address):
 
 
 def main():
-    # This disables CTRL+Z while the script is running
-    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+    if platform.system() != "Windows":
+        # This disables CTRL+Z while the script is running
+        signal.signal(signal.SIGTSTP, signal.SIG_IGN)
     
     # To change back to this dir 
     CURRENT_DIR = os.getcwd()
