@@ -146,7 +146,7 @@ def print_qr_code(address):
         # According to gomercin on GitHub, print_tty
         # prints out gibberish.
         # print_tty() shows a better looking QR code.
-        # So thats why I am using print__tty() instead
+        # So thats why I am using print_tty() instead
         # of print_ascii() for all operating systems
         qr.print_tty()
 
