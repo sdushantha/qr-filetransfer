@@ -24,7 +24,7 @@ def get_ssid():
     if operating_system == MacOS:
         ssid = os.popen("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk '/ SSID/ {print substr($0, index($0, $2))}'").read().strip()
         return ssid
-    
+
     elif operating_system == "Linux":
        ssid = os.popen("iwgetid -r").read().strip()
        return ssid
@@ -40,7 +40,7 @@ def get_ssid():
 
 
 def get_local_ip():
-    try: 
+    try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         return s.getsockname()[0]
@@ -59,8 +59,8 @@ def start_server(fname, cwd):
     SSID = get_ssid()
 
     # Using .tmpqr since .tmp is very common
-    #create the .tmp_qr folder in /tmp file of unix system 
-    TEMP_DIR_NAME = "/tmp/.tmp_qr" 
+    #create the .tmp_qr folder in /tmp file of unix system
+    TEMP_DIR_NAME = "/tmp/.tmp_qr"
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
@@ -103,7 +103,7 @@ def start_server(fname, cwd):
 
     handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(("", PORT), handler)
-    
+
     # Tweaking fname to make a perfect url
     fname = fname.split('/')
     fname = fname[-1]
@@ -121,7 +121,7 @@ def start_server(fname, cwd):
         os.chdir("..")
         rmtree(TEMP_DIR_NAME)
 
-    # If the user sent a directory, a zip was created and then copied to the 
+    # If the user sent a directory, a zip was created and then copied to the
     # temporary directory, this deletes the first created zip
     if delete_zip != 0:
 
@@ -131,7 +131,7 @@ def start_server(fname, cwd):
         os.remove(delete_zip)
     # Just being nice not messing up your bash prompt :)
     print("")
-    
+
     sys.exit()
 
 def print_qr_code(address):
@@ -159,8 +159,8 @@ def main():
         # SIGSTP does not work in Windows
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
-    
-    # So that we can come back to this dir 
+
+    # So that we can come back to this dir
     CURRENT_DIR = os.getcwd()
 
     # If no argument is given or invalid agrument then it shows help
