@@ -58,8 +58,8 @@ def start_server(fname, cwd):
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
 
-    # Using .tmpqr since .tmp is very common
-    #create the .tmp_qr folder in /tmp file of unix system
+    # Using .tmp_qr since .tmp is very common
+    # create the .tmp_qr folder in /tmp file of unix system
     TEMP_DIR_NAME = "/tmp/.tmp_qr"
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
@@ -91,14 +91,14 @@ def start_server(fname, cwd):
         print("Directory already exist") # preventing directory already exist crash..
 
     try:
-        # Move the file to .tmpqr
+        # Move the file to .tmp_qr
         copy2(fname, TEMP_DIR_NAME)
     except FileNotFoundError:
         print("No such file or directory")
         rmtree(TEMP_DIR_NAME)
         sys.exit()
 
-    # Change our directory to .tmpqr
+    # Change our directory to .tmp_qr
     os.chdir(TEMP_DIR_NAME)
 
     handler = http.server.SimpleHTTPRequestHandler
