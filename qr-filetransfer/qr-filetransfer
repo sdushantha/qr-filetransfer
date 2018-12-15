@@ -92,9 +92,7 @@ def start_server(fname):
         try:
             # Zips the directory
             path_to_zip = make_archive(zip_name, "zip", fname)
-            fname = path_to_zip.replace(os.getcwd(), "")
-            # The above line replacement leaves a / infront of the file name
-            fname = fname.replace("/", "")
+            fname = os.path.basename(path_to_zip)
             delete_zip = fname
         except PermissionError:
             print("Permission denied")
