@@ -77,7 +77,7 @@ def start_server(fname):
     SSID = get_ssid()
 
     if not os.path.exists(fname):
-        print("{} does not exist".format(fname))
+        print("No such file or directory")
         return
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
@@ -123,7 +123,7 @@ def start_server(fname):
     # this deletes the first created zip
     if delete_zip != 0:
         os.remove(delete_zip)
-    # Just being nice not messing up your bash prompt :)
+    # Just being nice and not messing up your bash prompt :)
     print("")
 
     sys.exit()
