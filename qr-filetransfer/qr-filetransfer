@@ -11,6 +11,7 @@ from shutil import make_archive, rmtree, copy2
 import pathlib
 import signal
 import platform
+import argparse
 
 
 MacOS = "Darwin"
@@ -71,7 +72,27 @@ def random_port():
     return random.randint(1024, 65535)
 
 
-def start_server(fname):
+def print_qr_code(address):
+    qr = qrcode.QRCode(version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,)
+    qr.add_data(address)
+    qr.make()
+
+    if operating_system != Windows:
+        # According to gomercin on GitHub, print_tty
+        # prints out gibberish.
+        # print_tty() shows a better looking QR code.
+        # So thats why I am using print_tty() instead
+        # of print_ascii() for all operating systems
+        qr.print_tty()
+
+    else:
+        qr.print_ascii()
+
+
+def start_server(fname, debug):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
@@ -111,7 +132,13 @@ def start_server(fname):
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
 
-    print("Scan the following QR to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+    print("Scan the following QR code to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+    
+    # There are many times where I just need to visit the url
+    # and cant bother scaning the QR code everytime when debugging
+    if debug:
+    	print(address)
+
     print_qr_code(address)
 
     try:
@@ -124,28 +151,9 @@ def start_server(fname):
     if delete_zip != 0:
         os.remove(delete_zip)
     # Just being nice and not messing up your bash prompt :)
-    print("")
+    print()
 
     sys.exit()
-
-def print_qr_code(address):
-    qr = qrcode.QRCode(version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,)
-    qr.add_data(address)
-    qr.make()
-
-    if operating_system != Windows:
-        # According to gomercin on GitHub, print_tty
-        # prints out gibberish.
-        # print_tty() shows a better looking QR code.
-        # So thats why I am using print_tty() instead
-        # of print_ascii() for all operating systems
-        qr.print_tty()
-
-    else:
-        qr.print_ascii()
 
 
 def main():
@@ -154,13 +162,14 @@ def main():
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-    # If no argument is given or invalid agrument then it shows help
-    if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help"]:
-        print("usage: qr-filetransfer.py [-h] FILE")
-        sys.exit()
+    parser = argparse.ArgumentParser(description = "Transfer files over WiFi from your computer to your smartphone from the terminal")
+    
+    parser.add_argument('file', action="store")
+    parser.add_argument('-d', '--debug', action="store_true", help="show the encoded url")
 
-    if sys.argv[1]:
-        start_server(fname=sys.argv[1])
+    args = parser.parse_args()
+
+    start_server(fname=args.file, debug=args.debug)
 
 if __name__=="__main__":
 	main()
