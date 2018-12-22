@@ -19,6 +19,24 @@ Windows = "Windows"
 operating_system = platform.system()
 
 
+def FileTransferServerHandlerClass(file_name):
+
+    class FileTransferServerHandler(http.server.SimpleHTTPRequestHandler):
+        _file_name = file_name
+
+        def do_GET(self):
+            # the self.path will start by '/', we truncate it.
+            request_path = self.path[1:]
+            if request_path != self._file_name:
+                # access denied
+                self.send_response(403)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+            else:
+                super().do_GET()
+
+    return FileTransferServerHandler
+
 def get_ssid():
 
     if operating_system == MacOS:
@@ -53,21 +71,23 @@ def random_port():
     return random.randint(1024, 65535)
 
 
-def start_server(fname, cwd):
+def start_server(fname):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
 
-    # Using .tmp_qr since .tmp is very common
-    # create the .tmp_qr folder in /tmp file of unix system
-    TEMP_DIR_NAME = "/tmp/.tmp_qr"
+    if not os.path.exists(fname):
+        print("{} does not exist".format(fname))
+        return
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
+    abs_path = os.path.normpath(os.path.abspath(fname))
+    file_dir = os.path.dirname(abs_path)
+    fname = os.path.basename(abs_path)
 
-    # Checking if given fname is a path
-    if fname.startswith("/"):
-        os.chdir("/")
+    # change to directory which contains file
+    os.chdir(file_dir)
 
     # Checking if given file name or path is a directory
     if os.path.isdir(fname):
@@ -76,38 +96,17 @@ def start_server(fname, cwd):
         try:
             # Zips the directory
             path_to_zip = make_archive(zip_name, "zip", fname)
-            fname = path_to_zip.replace(os.getcwd(), "")
-            # The above line replacement leaves a / infront of the file name
-            fname = fname.replace("/", "")
+            fname = os.path.basename(path_to_zip)
             delete_zip = fname
         except PermissionError:
             print("Permission denied")
             sys.exit()
 
-    # Makes a directory name .tmp_qr and stores the file there
-    try:
-        os.makedirs(TEMP_DIR_NAME)
-    except:
-        print("Directory already exist") # preventing directory already exist crash..
-
-    try:
-        # Move the file to .tmp_qr
-        copy2(fname, TEMP_DIR_NAME)
-    except FileNotFoundError:
-        print("No such file or directory")
-        rmtree(TEMP_DIR_NAME)
-        sys.exit()
-
-    # Change our directory to .tmp_qr
-    os.chdir(TEMP_DIR_NAME)
-
-    handler = http.server.SimpleHTTPRequestHandler
-    httpd = socketserver.TCPServer(("", PORT), handler)
-
     # Tweaking fname to make a perfect url
-    fname = fname.split('/')
-    fname = fname[-1]
     fname = fname.replace(" ", "%20")
+
+    handler = FileTransferServerHandlerClass(fname)
+    httpd = socketserver.TCPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
@@ -118,16 +117,11 @@ def start_server(fname, cwd):
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        os.chdir("..")
-        rmtree(TEMP_DIR_NAME)
+        pass
 
-    # If the user sent a directory, a zip was created and then copied to the
-    # temporary directory, this deletes the first created zip
+    # If the user sent a directory, a zip was created
+    # this deletes the first created zip
     if delete_zip != 0:
-
-        # Goes back to the dir where the qr-filetransfer was ran
-        # to delete the zip
-        os.chdir(cwd)
         os.remove(delete_zip)
     # Just being nice not messing up your bash prompt :)
     print("")
@@ -160,16 +154,13 @@ def main():
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-    # So that we can come back to this dir
-    CURRENT_DIR = os.getcwd()
-
     # If no argument is given or invalid agrument then it shows help
     if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help"]:
         print("usage: qr-filetransfer.py [-h] FILE")
         sys.exit()
 
     if sys.argv[1]:
-        start_server(fname=sys.argv[1], cwd=CURRENT_DIR)
+        start_server(fname=sys.argv[1])
 
 if __name__=="__main__":
 	main()
