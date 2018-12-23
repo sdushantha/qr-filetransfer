@@ -2,7 +2,6 @@
 
 
 [![Version](https://img.shields.io/badge/release-v1.2-blue.svg)](https://pypi.org/project/qr-filetransfer/)
-[![Closed Issues](https://img.shields.io/github/issues-closed-raw/sdushantha/qr-filetransfer.svg)](https://github.com/sdushantha/qr-filetransfer/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aclosed)
 [![Downloads](https://pepy.tech/badge/qr-filetransfer)](https://pepy.tech/project/qr-filetransfer)
 ![Support](https://img.shields.io/badge/support-Linux%20|%20Macos%20|%20Windows%20-blue.svg)
 
