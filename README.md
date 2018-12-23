@@ -9,7 +9,7 @@
 
 [![asciicast](https://asciinema.org/a/173861.png)](https://asciinema.org/a/173861)
 
-## 💾 Installation
+## Installation
 
 You will find the most updated version of ```qr-filetransfer``` here. But if you want the most stable version, use ```pip``` to install it
 
@@ -37,7 +37,7 @@ $ pip3 install -r requirements.txt
 ```
 
 
-## 🔨 Usage
+## Usage
 ```
 usage: qr-filetransfer [-h] [-debug] file
 
@@ -71,10 +71,10 @@ Transfer a full directory. **Note:** the directory gets zipped before being tran
 $ qr-filetransfer /path/to/directory/
 ```
 
-## 🌟 Credits
+## Credits
 Inspired by the Go project [qr-filetransfer](https://github.com/claudiodangelis/qr-filetransfer)
 
-## 📜 License
+## License
 MIT License
 
 Copyright (c) 2018 Siddharth Dushantha
