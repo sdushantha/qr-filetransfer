@@ -39,7 +39,17 @@ $ pip3 install -r requirements.txt
 
 ## 🔨 Usage
 ```
-usage: qr-filetransfer [-h] FILE
+usage: qr-filetransfer [-h] [-debug] file
+
+Transfer files over WiFi from your computer to your smartphone from the
+terminal
+
+positional arguments:
+  file             file the you want to transfer
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -debug, --debug  show the encoded url
 ```
 
 **Note:** Both devices needs to be connected to the same network
