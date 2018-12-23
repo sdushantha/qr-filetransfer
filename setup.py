@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
   name='qr-filetransfer',
-  version='1.2',
+  version='1.3',
   author='Siddharth Dushantha',
   author_email='siddharth.dushantha@gmail.com',
   description='Transfer files over WiFi from your computer to your smartphone from the terminal',

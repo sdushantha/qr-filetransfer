@@ -164,8 +164,8 @@ def main():
 
     parser = argparse.ArgumentParser(description = "Transfer files over WiFi from your computer to your smartphone from the terminal")
     
-    parser.add_argument('file', action="store")
-    parser.add_argument('-d', '--debug', action="store_true", help="show the encoded url")
+    parser.add_argument('file', action="store", help="file the you want to transfer")
+    parser.add_argument('-debug', '--debug', action="store_true", help="show the encoded url")
 
     args = parser.parse_args()
 
