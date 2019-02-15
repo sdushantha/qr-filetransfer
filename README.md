@@ -1,7 +1,4 @@
-<p align="center"><img src="carbon(1).png"><br></p>
-
-<p align="center">Transfer files over WiFi from your computer to your smartphone from the terminal</p>
-
+<p align="center"><img src="qr-filetrasnfer-material.png"><br></p>
 <p align="center">
 <a href="https://pypi.org/project/qr-filetransfer/"><img src="https://img.shields.io/badge/release-v1.3-blue.svg"></a>
 <a href="https://pepy.tech/badge/qr-filetransfe"><img src="https://pepy.tech/badge/qr-filetransfer"></a>
