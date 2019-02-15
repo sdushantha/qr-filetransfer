@@ -1,11 +1,14 @@
-# qr-filetransfer
+<p align="center"><img src="carbon(1).png"><br></p>
 
+<p align="center">Transfer files over WiFi from your computer to your smartphone from the terminal</p>
 
-[![Version](https://img.shields.io/badge/release-v1.3-blue.svg)](https://pypi.org/project/qr-filetransfer/)
-[![Downloads](https://pepy.tech/badge/qr-filetransfer)](https://pepy.tech/project/qr-filetransfer)
-![Support](https://img.shields.io/badge/support-Linux%20|%20MacOS%20|%20Windows%20-blue.svg)
+<p align="center">
+<a href="https://pypi.org/project/qr-filetransfer/"><img src="https://img.shields.io/badge/release-v1.3-blue.svg"></a>
+<a href="https://pepy.tech/badge/qr-filetransfe"><img src="https://pepy.tech/badge/qr-filetransfer"></a>
+<a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+<a href="https://img.shields.io/badge/support-Linux%20|%20MacOS%20|%20Windows%20-blue.svg"><img src="https://img.shields.io/badge/support-Linux%20|%20MacOS%20|%20Windows%20-blue.svg"></a>
+</p>
 
-> Transfer files over WiFi from your computer to your smartphone from the terminal
 
 [![asciicast](https://asciinema.org/a/173861.png)](https://asciinema.org/a/173861)
 
