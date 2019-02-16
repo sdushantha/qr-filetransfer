@@ -9,7 +9,7 @@
 
 
 
-[![asciicast](https://asciinema.org/a/173861.png)](https://asciinema.org/a/173861)
+[![asciicast](https://asciinema.org/a/173861.svg)](https://asciinema.org/a/173861)
 
 ## Installation
 
