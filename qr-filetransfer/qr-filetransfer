@@ -2,16 +2,21 @@
 
 import qrcode
 import http.server
+import html
 import socketserver
 import random
 import os
 import socket
 import sys
+import shutil
 from shutil import make_archive, rmtree, copy2
 import pathlib
 import signal
 import platform
 import argparse
+import urllib.request, urllib.parse, urllib.error
+import re
+from io import BytesIO
 
 
 MacOS = "Darwin"
@@ -37,6 +42,123 @@ def FileTransferServerHandlerClass(file_name):
                 super().do_GET()
 
     return FileTransferServerHandler
+
+def FileUploadServerHandlerClass(output_dir):
+
+    class FileUploadServerHandler(http.server.BaseHTTPRequestHandler):
+        _output_dir = output_dir
+
+        def do_GET(self):
+            f = self.send_head()
+            if f:
+                self.copyfile(f, self.wfile)
+                f.close()
+
+        def do_HEAD(self):
+            f = self.send_head()
+            if f:
+                f.close()
+
+        def do_POST(self):
+            """Serve a POST request."""
+            r, info = self.deal_post_data()
+            print((r, info, "by: ", self.client_address))
+            f = BytesIO()
+            f.write(b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
+            f.write(b"<html>\n<title>Upload Result Page</title>\n")
+            f.write(b"<body>\n<h2>Upload Result Page</h2>\n")
+            f.write(b"<hr>\n")
+            if r:
+                f.write(b"<strong>Success:</strong>")
+            else:
+                f.write(b"<strong>Failed:</strong>")
+            f.write(info.encode())
+            f.write(("<br><a href=\"%s\">back</a>" % self.headers['referer']).encode())
+            f.write(b"<hr><small>Powerd By: ")
+            f.write(b"<a href=\"https://github.com/sdushantha/\">")
+            f.write(b"sdushantha</a> and \n")
+            f.write(b"<a href=\"https://github.com/npes87184/\">")
+            f.write(b"npes87184</a>, check new version at \n")
+            f.write(b"<a href=\"https://pypi.org/project/qr-filetransfer/\">")
+            f.write(b"here</a>.</small></body>\n</html>\n")
+            length = f.tell()
+            f.seek(0)
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.send_header("Content-Length", str(length))
+            self.end_headers()
+            if f:
+                self.copyfile(f, self.wfile)
+                f.close()
+
+        def deal_post_data(self):
+            uploaded_files = []
+            content_type = self.headers['content-type']
+            if not content_type:
+                return (False, "Content-Type header doesn't contain boundary")
+            boundary = content_type.split("=")[1].encode()
+            remainbytes = int(self.headers['content-length'])
+            line = self.rfile.readline()
+            remainbytes -= len(line)
+            if not boundary in line:
+                return (False, "Content NOT begin with boundary")
+            while remainbytes > 0:
+                line = self.rfile.readline()
+                remainbytes -= len(line)
+                fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode())
+                if not fn:
+                    return (False, "Can't find out file name...")
+                fn = os.path.join(self._output_dir, fn[0])
+                line = self.rfile.readline()
+                remainbytes -= len(line)
+                line = self.rfile.readline()
+                remainbytes -= len(line)
+                try:
+                    out = open(fn, 'wb')
+                except IOError:
+                    return (False, "Can't create file to write, do you have permission to write?")
+                else:
+                    with out:
+                        preline = self.rfile.readline()
+                        remainbytes -= len(preline)
+                        while remainbytes > 0:
+                            line = self.rfile.readline()
+                            remainbytes -= len(line)
+                            if boundary in line:
+                                preline = preline[0:-1]
+                                if preline.endswith(b'\r'):
+                                    preline = preline[0:-1]
+                                out.write(preline)
+                                uploaded_files.append(fn)
+                                break
+                            else:
+                                out.write(preline)
+                                preline = line
+            return (True, "File '%s' upload success!" % ",".join(uploaded_files))
+
+        def send_head(self):
+            f = BytesIO()
+            displaypath = html.escape(urllib.parse.unquote(self.path))
+            f.write(b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
+            f.write(("<html>\n<title>Please choose file to upload to %s</title>\n" % self._output_dir).encode())
+            f.write(("<body>\n<h2>Please choose file to upload to %s</h2>\n" % self._output_dir).encode())
+            f.write(b"<hr>\n")
+            f.write(b"<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
+            f.write(b"<input name=\"file\" type=\"file\" multiple/>")
+            f.write(b"<input type=\"submit\" value=\"upload\"/></form>\n")
+            f.write(b"</body>\n</html>\n")
+            length = f.tell()
+            f.seek(0)
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.send_header("Content-Length", str(length))
+            self.end_headers()
+            return f
+
+        def copyfile(self, source, outputfile):
+            shutil.copyfileobj(source, outputfile)
+
+    return FileUploadServerHandler
 
 def get_ssid():
 
@@ -92,45 +214,45 @@ def print_qr_code(address):
         qr.print_ascii()
 
 
-def start_server(fname, debug):
+def start_download_server(file_path, debug):
     PORT = random_port()
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
 
-    if not os.path.exists(fname):
+    if not os.path.exists(file_path):
         print("No such file or directory")
         return
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
-    abs_path = os.path.normpath(os.path.abspath(fname))
+    abs_path = os.path.normpath(os.path.abspath(file_path))
     file_dir = os.path.dirname(abs_path)
-    fname = os.path.basename(abs_path)
+    file_path = os.path.basename(abs_path)
 
     # change to directory which contains file
     os.chdir(file_dir)
 
     # Checking if given file name or path is a directory
-    if os.path.isdir(fname):
-        zip_name = pathlib.PurePosixPath(fname).name
+    if os.path.isdir(file_path):
+        zip_name = pathlib.PurePosixPath(file_path).name
 
         try:
             # Zips the directory
-            path_to_zip = make_archive(zip_name, "zip", fname)
-            fname = os.path.basename(path_to_zip)
-            delete_zip = fname
+            path_to_zip = make_archive(zip_name, "zip", file_path)
+            file_path = os.path.basename(path_to_zip)
+            delete_zip = file_path
         except PermissionError:
             print("Permission denied")
             sys.exit()
 
-    # Tweaking fname to make a perfect url
-    fname = fname.replace(" ", "%20")
+    # Tweaking file_path to make a perfect url
+    file_path = file_path.replace(" ", "%20")
 
-    handler = FileTransferServerHandlerClass(fname)
+    handler = FileTransferServerHandlerClass(file_path)
     httpd = socketserver.TCPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
-    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
+    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file_path
 
     print("Scan the following QR code to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
 
@@ -155,6 +277,44 @@ def start_server(fname, debug):
 
     sys.exit()
 
+def start_upload_server(file_path, debug):
+    PORT = random_port()
+    LOCAL_IP = get_local_ip()
+    SSID = get_ssid()
+
+    if not os.path.exists(file_path):
+        print("No such file or directory")
+        return
+
+    if not os.path.isdir(file_path):
+        print("%s is not a folder." % file_path)
+        return
+
+    handler = FileUploadServerHandlerClass(file_path)
+    httpd = socketserver.TCPServer(("", PORT), handler)
+
+    # This is the url to be encoded into the QR code
+    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/"
+
+    print("Scan the following QR code to start uploading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+
+    # There are many times where I just need to visit the url
+    # and cant bother scaning the QR code everytime when debugging
+    if debug:
+    	print(address)
+
+    print_qr_code(address)
+
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+    # Just being nice and not messing up your bash prompt :)
+    print()
+
+    sys.exit()
+
 
 def main():
     if operating_system != Windows:
@@ -162,14 +322,18 @@ def main():
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-    parser = argparse.ArgumentParser(description = "Transfer files over WiFi from your computer to your smartphone from the terminal")
+    parser = argparse.ArgumentParser(description = "Transfer files over WiFi between your computer and your smartphone from the terminal")
 
-    parser.add_argument('file', action="store", help="file the you want to transfer")
-    parser.add_argument('-debug', '--debug', action="store_true", help="show the encoded url")
+    parser.add_argument('file_path', action="store", help="path that you want to transfer or store the received file.")
+    parser.add_argument('-debug', '--debug', action="store_true", help="ehow the encoded url.")
+    parser.add_argument('-receive', '-r', action="store_true", help="enable upload mode, received file will be stored at given path.")
 
     args = parser.parse_args()
 
-    start_server(fname=args.file, debug=args.debug)
+    if args.receive:
+        start_upload_server(file_path=args.file_path, debug=args.debug)
+    else:
+        start_download_server(file_path=args.file_path, debug=args.debug)
 
 if __name__=="__main__":
 	main()
