@@ -133,7 +133,7 @@ def start_server(fname, debug):
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + fname
 
     print("Scan the following QR code to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
-    
+
     # There are many times where I just need to visit the url
     # and cant bother scaning the QR code everytime when debugging
     if debug:
@@ -163,7 +163,7 @@ def main():
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
     parser = argparse.ArgumentParser(description = "Transfer files over WiFi from your computer to your smartphone from the terminal")
-    
+
     parser.add_argument('file', action="store", help="file the you want to transfer")
     parser.add_argument('-debug', '--debug', action="store_true", help="show the encoded url")
 
