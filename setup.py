@@ -11,7 +11,7 @@ setuptools.setup(
   description='Transfer files over WiFi from your computer to your smartphone from the terminal',
   long_description=long_description,
   long_description_content_type='text/markdown',
-  url='http://https://github.com/sdushantha/qr-filetransfer',
+  url='https://github.com/sdushantha/qr-filetransfer',
   packages=setuptools.find_packages(),
   scripts=['qr-filetransfer/qr-filetransfer'],
   install_requires=['qrcode']
