@@ -41,17 +41,19 @@ $ pip3 install -r requirements.txt
 
 ## Usage
 ```
-usage: qr-filetransfer [-h] [-debug] file
+usage: qr-filetransfer [-h] [-debug] [-receive] file_path
 
-Transfer files over WiFi from your computer to your smartphone from the
+Transfer files over WiFi between your computer and your smartphone from the
 terminal
 
 positional arguments:
-  file             file the you want to transfer
+  file_path        path that you want to transfer or store the received file.
 
 optional arguments:
   -h, --help       show this help message and exit
-  -debug, --debug  show the encoded url
+  -debug, --debug  ehow the encoded url
+  -receive, -r     enable upload mode, received file will be stored at given
+                   path
 ```
 
 **Note:** Both devices needs to be connected to the same network
@@ -71,6 +73,11 @@ $ qr-filetransfer /path/to/file.txt
 Transfer a full directory. **Note:** the directory gets zipped before being transferred
 ```bash
 $ qr-filetransfer /path/to/directory/
+```
+
+Receive/upload a file from your phone to your computer
+```bash
+$ qr-filetransfer -r /path/receive/file/to/
 ```
 
 ## Credits
