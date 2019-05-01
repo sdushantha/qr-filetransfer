@@ -46,7 +46,12 @@ def FileTransferServerHandlerClass(file_name):
 def FileUploadServerHandlerClass(output_dir):
 
     class FileUploadServerHandler(http.server.BaseHTTPRequestHandler):
-        _output_dir = output_dir
+        absolute_path = os.path.abspath(output_dir)
+        # Making the path look nicer
+        # /User/Jeff/Downloads --> ~/Downloads
+        home = os.path.expanduser("~")
+        path = absolute_path
+        _output_dir = path.replace(home, "~")
 
         def do_GET(self):
             f = self.send_head()
