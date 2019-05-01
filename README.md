@@ -77,7 +77,7 @@ $ qr-filetransfer /path/to/directory/
 
 Receive/upload a file from your phone to your computer
 ```bash
-$ qr-filetransfer -r /path/receive/file/to/
+$ qr-filetransfer -r /path/to/receive/file/to/
 ```
 
 ## Credits
