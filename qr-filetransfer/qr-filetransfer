@@ -23,7 +23,17 @@ MacOS = "Darwin"
 Linux = "Linux"
 Windows = "Windows"
 operating_system = platform.system()
-
+message = """
+╭──────────────────────────────────────────────────────────────────╮
+│ This port is being used. Try another port.                       │
+│ If you are very sure that this port is NOT in use,               │
+│ then try running this script again because there is known issue  │
+│ where an error is thrown even though the port is not being used. │
+│ This will be fixed very soon.                                    │
+│                                                                  │
+│ - Developers of qr-filetrasfer                                   │
+╰──────────────────────────────────────────────────────────────────╯
+"""
 
 def FileTransferServerHandlerClass(file_name):
 
@@ -226,8 +236,19 @@ def print_qr_code(address):
         qr.print_ascii()
 
 
-def start_download_server(file_path, debug):
-    PORT = random_port()
+def start_download_server(file_path, debug, custom_port):
+    """
+    Keyword Arguments:
+    file_path        -- String indicating the path to download the file to 
+    debug            -- Boolean indication whether to output the encoded url
+    custom_port      -- String indicating what custom port the user wants to use
+    """
+
+    if not custom_port:
+        PORT = random_port()
+    
+    PORT = int(custom_port)
+    
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
 
@@ -289,8 +310,19 @@ def start_download_server(file_path, debug):
 
     sys.exit()
 
-def start_upload_server(file_path, debug):
-    PORT = random_port()
+def start_upload_server(file_path, debug, custom_port):
+    """
+    Keyword Arguments:
+    file_path        -- String indicating the path of the file to be uploaded
+    debug            -- Boolean indication whether to output the encoded url
+    custom_port      -- String indicating what custom port the user wants to use
+    """
+
+    if not custom_port:
+        PORT = random_port()
+    
+    PORT = int(custom_port)
+
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
 
@@ -303,7 +335,12 @@ def start_upload_server(file_path, debug):
         return
 
     handler = FileUploadServerHandlerClass(file_path)
-    httpd = socketserver.TCPServer(("", PORT), handler)
+
+    try:
+        httpd = socketserver.TCPServer(("", PORT), handler)
+    except OSError:
+        print(message)
+        sys.exit()
 
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/"
@@ -337,15 +374,16 @@ def main():
     parser = argparse.ArgumentParser(description = "Transfer files over WiFi between your computer and your smartphone from the terminal")
 
     parser.add_argument('file_path', action="store", help="path that you want to transfer or store the received file.")
-    parser.add_argument('-debug', '--debug', action="store_true", help="ehow the encoded url.")
-    parser.add_argument('-receive', '-r', action="store_true", help="enable upload mode, received file will be stored at given path.")
+    parser.add_argument('--debug', '-d', action="store_true", help="ehow the encoded url.")
+    parser.add_argument('--receive', '-r', action="store_true", help="enable upload mode, received file will be stored at given path.")
+    parser.add_argument('--port', '-p', dest="port", help="enable upload mode, received file will be stored at given path.")
 
     args = parser.parse_args()
 
     if args.receive:
-        start_upload_server(file_path=args.file_path, debug=args.debug)
+        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port)
     else:
-        start_download_server(file_path=args.file_path, debug=args.debug)
+        start_download_server(file_path=args.file_path, debug=args.debug, custom_port=args.port)
 
 if __name__=="__main__":
 	main()
