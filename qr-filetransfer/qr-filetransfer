@@ -254,10 +254,10 @@ def start_download_server(file_path, debug, custom_port):
     custom_port      -- String indicating what custom port the user wants to use
     """
 
-    if not custom_port:
+    if custom_port:
+        PORT = int(custom_port)
+    else:
         PORT = random_port()
-    
-    PORT = int(custom_port)
     
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
@@ -329,10 +329,10 @@ def start_upload_server(file_path, debug, custom_port):
     custom_port      -- String indicating what custom port the user wants to use
     """
 
-    if not custom_port:
+    if custom_port:
+        PORT = int(custom_port)
+    else:
         PORT = random_port()
-    
-    PORT = int(custom_port)
 
     LOCAL_IP = get_local_ip()
     SSID = get_ssid()
