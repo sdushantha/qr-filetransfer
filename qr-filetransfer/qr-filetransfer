@@ -35,10 +35,12 @@ message = """
 ╰──────────────────────────────────────────────────────────────────╯
 """
 
+
 def FileTransferServerHandlerClass(file_name):
 
     class FileTransferServerHandler(http.server.SimpleHTTPRequestHandler):
         _file_name = file_name
+
 
         def do_GET(self):
             # the self.path will start by '/', we truncate it.
@@ -53,6 +55,7 @@ def FileTransferServerHandlerClass(file_name):
 
     return FileTransferServerHandler
 
+
 def FileUploadServerHandlerClass(output_dir):
 
     class FileUploadServerHandler(http.server.BaseHTTPRequestHandler):
@@ -63,16 +66,19 @@ def FileUploadServerHandlerClass(output_dir):
         path = absolute_path
         _output_dir = path.replace(home, "~")
 
+
         def do_GET(self):
             f = self.send_head()
             if f:
                 self.copyfile(f, self.wfile)
                 f.close()
 
+
         def do_HEAD(self):
             f = self.send_head()
             if f:
                 f.close()
+
 
         def do_POST(self):
             """Serve a POST request."""
@@ -105,6 +111,7 @@ def FileUploadServerHandlerClass(output_dir):
             if f:
                 self.copyfile(f, self.wfile)
                 f.close()
+
 
         def deal_post_data(self):
             uploaded_files = []
@@ -151,6 +158,7 @@ def FileUploadServerHandlerClass(output_dir):
                                 preline = line
             return (True, "File '%s' upload success!" % ",".join(uploaded_files))
 
+
         def send_head(self):
             f = BytesIO()
             displaypath = html.escape(urllib.parse.unquote(self.path))
@@ -177,10 +185,12 @@ def FileUploadServerHandlerClass(output_dir):
             self.end_headers()
             return f
 
+
         def copyfile(self, source, outputfile):
             shutil.copyfileobj(source, outputfile)
 
     return FileUploadServerHandler
+
 
 def get_ssid():
 
@@ -309,6 +319,7 @@ def start_download_server(file_path, debug, custom_port):
     print()
 
     sys.exit()
+
 
 def start_upload_server(file_path, debug, custom_port):
     """
