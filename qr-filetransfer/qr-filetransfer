@@ -144,14 +144,21 @@ def FileUploadServerHandlerClass(output_dir):
         def send_head(self):
             f = BytesIO()
             displaypath = html.escape(urllib.parse.unquote(self.path))
-            
-            # TODO: FIX THE HTML
-            # This HTML is very messy and I am aware of that. I will fix this later. It takes time
-            # to copy and paste the HTML code line by line into the f.write()
-            # Might use vim to automate this :)
-            f.write(b"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\"><html><title>qr-filetransfer</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link href=\"https://fonts.googleapis.com/css?family=Comfortaa\" rel=\"stylesheet\"><link rel=\"icon\" href=\"https://raw.githubusercontent.com/sdushantha/qr-filetransfer/master/logo.png\" type=\"image/png\"><body><center><img src=\"https://raw.githubusercontent.com/sdushantha/qr-filetransfer/master/logo.png\">")
+
+            f.write(b"<title>qr-filetransfer</title>")
+            f.write(b"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
+            f.write(b"<link href=\"https://fonts.googleapis.com/css?family=Comfortaa\" rel=\"stylesheet\">")
+            f.write(b"<link rel=\"icon\" href=\"https://raw.githubusercontent.com/sdushantha/qr-filetransfer/master/logo.png\" type=\"image/png\">")
+            f.write(b"<body>")
+            f.write(b"<center>")
+            f.write(b"<img src=\"https://raw.githubusercontent.com/sdushantha/qr-filetransfer/master/logo.png\">")
             f.write(("<body>\n<h2 style=\"font-family: 'Comfortaa', cursive;color:'#263238';\">Please choose file to upload to %s</h2>\n" % self._output_dir).encode())
-            f.write(b"<hr><form ENCTYPE=\"multipart/form-data\" method=\"post\"><input style=\"font-family:'Comfortaa', cursive;color:'#263238';\" name=\"file\" type=\"file\" multiple/><input type=\"submit\" value=\"upload\"/></form></center></body></html>")
+            f.write(b"<hr>")
+            f.write(b"<form ENCTYPE=\"multipart/form-data\" method=\"post\"><input style=\"font-family:'Comfortaa', cursive;color:'#263238';\" name=\"file\" type=\"file\" multiple/><input type=\"submit\" value=\"upload\"/></form>")
+            f.write(b"</center>")
+            f.write(b"</body>")
+            f.write(b"</html>")
+
             length = f.tell()
             f.seek(0)
             self.send_response(200)
