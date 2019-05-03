@@ -1,4 +1,4 @@
-<p align="center"><img src="logo.png"><br></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sdushantha/qr-filetransfer/master/logo.png"><br></p>
 <p align="center">
 <a href="https://pypi.org/project/qr-filetransfer/"><img src="https://img.shields.io/badge/release-v2.0-blue.svg"></a>
 <a href="https://pepy.tech/badge/qr-filetransfe"><img src="https://pepy.tech/badge/qr-filetransfer"></a>
