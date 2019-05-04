@@ -63,8 +63,8 @@ def FileUploadServerHandlerClass(output_dir):
         # Making the path look nicer
         # /User/Jeff/Downloads --> ~/Downloads
         home = os.path.expanduser("~")
-        path = absolute_path
-        _output_dir = path.replace(home, "~")
+        nice_path = absolute_path.replace(home, "~")
+        _output_dir = output_dir
 
 
         def do_GET(self):
@@ -137,7 +137,8 @@ def FileUploadServerHandlerClass(output_dir):
                 fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode("utf-8", "backslashreplace"))
                 if not fn:
                     return (False, "Can't find out file name...")
-                fn = os.path.join(self._output_dir, fn[0])
+                file_name = fn[0]
+                fn = os.path.join(self._output_dir, file_name)
                 line = self.rfile.readline()
                 remainbytes -= len(line)
                 line = self.rfile.readline()
@@ -158,7 +159,7 @@ def FileUploadServerHandlerClass(output_dir):
                                 if preline.endswith(b'\r'):
                                     preline = preline[0:-1]
                                 out.write(preline)
-                                uploaded_files.append(fn)
+                                uploaded_files.append(os.path.join(self.nice_path, file_name))
                                 break
                             else:
                                 out.write(preline)
@@ -168,7 +169,7 @@ def FileUploadServerHandlerClass(output_dir):
 
         def send_head(self):
             f = BytesIO()
-            displaypath = html.escape(urllib.parse.unquote(self.path))
+            displaypath = html.escape(urllib.parse.unquote(self.nice_path))
 
             f.write(b"<title>qr-filetransfer</title>")
             f.write(b"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
@@ -177,7 +178,7 @@ def FileUploadServerHandlerClass(output_dir):
             f.write(b"<body>")
             f.write(b"<center>")
             f.write(b"<img src=\"https://raw.githubusercontent.com/sdushantha/qr-filetransfer/master/logo.png\">")
-            f.write(("<body>\n<h2 style=\"font-family: 'Comfortaa', cursive;color:'#263238';\">Please choose file to upload to %s</h2>\n" % self._output_dir).encode())
+            f.write(("<body>\n<h2 style=\"font-family: 'Comfortaa', cursive;color:'#263238';\">Please choose file to upload to %s</h2>\n" % displaypath).encode())
             f.write(b"<hr>")
             f.write(b"<form ENCTYPE=\"multipart/form-data\" method=\"post\"><input style=\"font-family:'Comfortaa', cursive;color:'#263238';\" name=\"file\" type=\"file\" multiple/><input type=\"submit\" value=\"upload\"/></form>")
             f.write(b"</center>")
