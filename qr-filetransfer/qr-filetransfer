@@ -14,7 +14,9 @@ import pathlib
 import signal
 import platform
 import argparse
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import re
 from io import BytesIO
 import qrcode
@@ -130,7 +132,8 @@ def FileUploadServerHandlerClass(output_dir):
             remainbytes = int(self.headers['content-length'])
             line = self.rfile.readline()
             remainbytes -= len(line)
-            if not boundary in line:
+
+            if boundary not in line:
                 return (False, "Content NOT begin with boundary")
             while remainbytes > 0:
                 line = self.rfile.readline()
