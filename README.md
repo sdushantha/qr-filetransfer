@@ -52,11 +52,10 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --debug, -d           ehow the encoded url.
+  --debug, -d           show the encoded url.
   --receive, -r         enable upload mode, received file will be stored at
                         given path.
-  --port PORT, -p PORT  enable upload mode, received file will be stored at
-                        given path.
+  --port PORT, -p PORT  use custom port
 ```
 
 **Note:** Both devices needs to be connected to the same network
