@@ -397,9 +397,9 @@ def main():
     parser = argparse.ArgumentParser(description="Transfer files over WiFi between your computer and your smartphone from the terminal")
 
     parser.add_argument('file_path', action="store", help="path that you want to transfer or store the received file.")
-    parser.add_argument('--debug', '-d', action="store_true", help="ehow the encoded url.")
+    parser.add_argument('--debug', '-d', action="store_true", help="show the encoded url.")
     parser.add_argument('--receive', '-r', action="store_true", help="enable upload mode, received file will be stored at given path.")
-    parser.add_argument('--port', '-p', dest="port", help="enable upload mode, received file will be stored at given path.")
+    parser.add_argument('--port', '-p', dest="port", help="use a custom port")
 
     args = parser.parse_args()
 
