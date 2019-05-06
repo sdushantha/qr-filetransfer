@@ -5,7 +5,7 @@
 <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 <a href="https://img.shields.io/badge/support-Linux%20|%20MacOS%20|%20Windows%20-blue.svg"><img src="https://img.shields.io/badge/support-Linux%20|%20MacOS%20|%20Windows%20-blue.svg"></a>
 </p>
-<p align="center">✨Transfer files over WiFi from your computer to your smartphone from the terminal✨</p>
+<p align="center">✨Transfer files over WiFi between your computer and your smartphone from the terminal✨</p>
 
 
 
