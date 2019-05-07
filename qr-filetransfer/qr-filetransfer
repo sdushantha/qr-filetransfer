@@ -211,7 +211,9 @@ def get_ssid():
         return ssid
 
     elif operating_system == "Linux":
-        ssid = os.popen("iwgetid -r").read().strip()
+        ssid = os.popen("iwgetid -r 2>/dev/null",).read().strip()
+        if not ssid:
+            ssid = os.popen("nmcli -t -f active,ssid dev wifi | egrep '^yes' | cut -d\\' -f2 | sed 's/yes://g' 2>/dev/null").read().strip()
         return ssid
 
     else:
