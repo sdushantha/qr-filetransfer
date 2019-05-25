@@ -41,7 +41,9 @@ $ pip3 install -r requirements.txt
 
 ## Usage
 ```
-usage: qr-filetransfer [-h] [--debug] [--receive] [--port PORT] file_path
+usage: qr-filetransfer [-h] [--debug] [--receive] [--port PORT]
+                       [--ip_addr {192.168.0.104,10.10.10.10}]
+                       file_path
 
 Transfer files over WiFi between your computer and your smartphone from the
 terminal
@@ -56,6 +58,8 @@ optional arguments:
   --receive, -r         enable upload mode, received file will be stored at
                         given path.
   --port PORT, -p PORT  use custom port
+  --ip_addr {192.168.0.104,10.10.10.10}
+                        use a custom IP address
 ```
 
 **Note:** Both devices needs to be connected to the same network
