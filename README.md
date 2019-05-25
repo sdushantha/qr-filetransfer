@@ -59,7 +59,7 @@ optional arguments:
                         given path.
   --port PORT, -p PORT  use custom port
   --ip_addr {192.168.0.104,10.10.10.10}
-                        use a custom IP address
+                        specify IP address
 ```
 
 **Note:** Both devices needs to be connected to the same network

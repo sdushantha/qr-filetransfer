@@ -241,7 +241,7 @@ def get_local_ips_available():
     """Get a list of all local IPv4 addresses except localhost"""
     ips = []
     for iface in netifaces.interfaces():
-        ips.extend([x["addr"] for x in netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) if x])
+        ips.extend([x["addr"] for x in netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) if x and "addr" in x])
 
     localhost_ip = re.compile('^127.+$')
     return [x for x in sorted(ips) if not localhost_ip.match(x)]
@@ -271,13 +271,13 @@ def print_qr_code(address):
         qr.print_ascii()
 
 
-def start_download_server(file_path, debug, custom_port, custom_ip_addr):
+def start_download_server(file_path, debug, custom_port, ip_addr):
     """
     Keyword Arguments:
     file_path        -- String indicating the path to download the file to
     debug            -- Boolean indication whether to output the encoded url
     custom_port      -- String indicating what custom port the user wants to use
-    custom_ip_addr   -- String indicating which IP address the user wants to use
+    ip_addr          -- String indicating which IP address the user wants to use
     """
 
     if custom_port:
@@ -285,8 +285,8 @@ def start_download_server(file_path, debug, custom_port, custom_ip_addr):
     else:
         PORT = random_port()
 
-    if custom_ip_addr:
-        LOCAL_IP = custom_ip_addr
+    if ip_addr:
+        LOCAL_IP = ip_addr
     else:
         LOCAL_IP = get_local_ip()
 
@@ -351,13 +351,13 @@ def start_download_server(file_path, debug, custom_port, custom_ip_addr):
     sys.exit()
 
 
-def start_upload_server(file_path, debug, custom_port, custom_ip_addr):
+def start_upload_server(file_path, debug, custom_port, ip_addr):
     """
     Keyword Arguments:
     file_path        -- String indicating the path of the file to be uploaded
     debug            -- Boolean indication whether to output the encoded url
     custom_port      -- String indicating what custom port the user wants to use
-    custom_ip_addr   -- String indicating which IP address the user want to use
+    ip_addr          -- String indicating which IP address the user want to use
     """
 
     if custom_port:
@@ -365,8 +365,8 @@ def start_upload_server(file_path, debug, custom_port, custom_ip_addr):
     else:
         PORT = random_port()
 
-    if custom_ip_addr:
-        LOCAL_IP = custom_ip_addr
+    if ip_addr:
+        LOCAL_IP = ip_addr
     else:
         LOCAL_IP = get_local_ip()
 
@@ -423,14 +423,14 @@ def main():
     parser.add_argument('--debug', '-d', action="store_true", help="show the encoded url.")
     parser.add_argument('--receive', '-r', action="store_true", help="enable upload mode, received file will be stored at given path.")
     parser.add_argument('--port', '-p', dest="port", help="use a custom port")
-    parser.add_argument('--ip_addr', dest="ip_addr", choices=get_local_ips_available(), help="use a custom IP address")
+    parser.add_argument('--ip_addr', dest="ip_addr", choices=get_local_ips_available(), help="specify IP address")
 
     args = parser.parse_args()
 
     if args.receive:
-        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, custom_ip_addr=args.ip_addr)
+        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr)
     else:
-        start_download_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, custom_ip_addr=args.ip_addr)
+        start_download_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr)
 
 if __name__ == "__main__":
     main()
