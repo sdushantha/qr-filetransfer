@@ -435,12 +435,14 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
 
     sys.exit()
 
+
 def b64_auth(a):
     splited = a.split(':')
     if len(splited) != 2:
         msg = "The format of auth should be [username:password]"
         raise argparse.ArgumentTypeError(msg)
     return base64.b64encode(a.encode())
+
 
 def main():
     if operating_system != Windows:
