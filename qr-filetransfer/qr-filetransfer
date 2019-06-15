@@ -72,7 +72,7 @@ def FileTransferServerHandlerClass(file_name, auth):
     return FileTransferServerHandler
 
 
-def FileUploadServerHandlerClass(output_dir):
+def FileUploadServerHandlerClass(output_dir, auth):
 
     class FileUploadServerHandler(http.server.BaseHTTPRequestHandler):
         absolute_path = os.path.abspath(output_dir)
@@ -81,9 +81,20 @@ def FileUploadServerHandlerClass(output_dir):
         home = os.path.expanduser("~")
         nice_path = absolute_path.replace(home, "~")
         _output_dir = output_dir
+        _auth = auth
 
+        def do_AUTHHEAD(self):
+            self.send_response(401)
+            self.send_header('WWW-Authenticate', 'Basic realm=\"qr-filetransfer\"')
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
 
         def do_GET(self):
+            if self._auth is not None:
+                if self.headers.get('Authorization') != 'Basic ' + (self._auth.decode()):
+                    self.do_AUTHHEAD()
+                    return
+
             f = self.send_head()
             if f:
                 self.copyfile(f, self.wfile)
@@ -364,13 +375,14 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     sys.exit()
 
 
-def start_upload_server(file_path, debug, custom_port, ip_addr):
+def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
     """
     Keyword Arguments:
     file_path        -- String indicating the path of the file to be uploaded
     debug            -- Boolean indication whether to output the encoded url
     custom_port      -- String indicating what custom port the user wants to use
     ip_addr          -- String indicating which IP address the user want to use
+    auth             -- String indicating base64 encoded username:password
     """
 
     if custom_port:
@@ -393,7 +405,7 @@ def start_upload_server(file_path, debug, custom_port, ip_addr):
         print("%s is not a folder." % file_path)
         return
 
-    handler = FileUploadServerHandlerClass(file_path)
+    handler = FileUploadServerHandlerClass(file_path, auth)
 
     try:
         httpd = socketserver.TCPServer(("", PORT), handler)
@@ -448,7 +460,7 @@ def main():
     args = parser.parse_args()
 
     if args.receive:
-        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr)
+        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr, auth=args.auth)
     else:
         start_download_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr, auth=args.auth)
 
