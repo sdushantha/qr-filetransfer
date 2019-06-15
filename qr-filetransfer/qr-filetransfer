@@ -21,6 +21,7 @@ import re
 from io import BytesIO
 import netifaces
 import qrcode
+import base64
 
 
 MacOS = "Darwin"
@@ -40,13 +41,24 @@ message = """
 """
 
 
-def FileTransferServerHandlerClass(file_name):
+def FileTransferServerHandlerClass(file_name, auth):
 
     class FileTransferServerHandler(http.server.SimpleHTTPRequestHandler):
         _file_name = file_name
+        _auth = auth
 
+        def do_AUTHHEAD(self):
+            self.send_response(401)
+            self.send_header('WWW-Authenticate', 'Basic realm=\"qr-filetransfer\"')
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
 
         def do_GET(self):
+            if self._auth is not None:
+                if self.headers.get('Authorization') != 'Basic ' + (self._auth.decode()):
+                    self.do_AUTHHEAD()
+                    return
+
             # the self.path will start by '/', we truncate it.
             request_path = self.path[1:]
             if request_path != self._file_name:
@@ -60,7 +72,7 @@ def FileTransferServerHandlerClass(file_name):
     return FileTransferServerHandler
 
 
-def FileUploadServerHandlerClass(output_dir):
+def FileUploadServerHandlerClass(output_dir, auth):
 
     class FileUploadServerHandler(http.server.BaseHTTPRequestHandler):
         absolute_path = os.path.abspath(output_dir)
@@ -69,9 +81,20 @@ def FileUploadServerHandlerClass(output_dir):
         home = os.path.expanduser("~")
         nice_path = absolute_path.replace(home, "~")
         _output_dir = output_dir
+        _auth = auth
 
+        def do_AUTHHEAD(self):
+            self.send_response(401)
+            self.send_header('WWW-Authenticate', 'Basic realm=\"qr-filetransfer\"')
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
 
         def do_GET(self):
+            if self._auth is not None:
+                if self.headers.get('Authorization') != 'Basic ' + (self._auth.decode()):
+                    self.do_AUTHHEAD()
+                    return
+
             f = self.send_head()
             if f:
                 self.copyfile(f, self.wfile)
@@ -271,13 +294,14 @@ def print_qr_code(address):
         qr.print_ascii()
 
 
-def start_download_server(file_path, debug, custom_port, ip_addr):
+def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     """
     Keyword Arguments:
     file_path        -- String indicating the path to download the file to
     debug            -- Boolean indication whether to output the encoded url
     custom_port      -- String indicating what custom port the user wants to use
     ip_addr          -- String indicating which IP address the user wants to use
+    auth             -- String indicating base64 encoded username:password
     """
 
     if custom_port:
@@ -321,7 +345,7 @@ def start_download_server(file_path, debug, custom_port, ip_addr):
     # Tweaking file_path to make a perfect url
     file_path = file_path.replace(" ", "%20")
 
-    handler = FileTransferServerHandlerClass(file_path)
+    handler = FileTransferServerHandlerClass(file_path, auth)
     httpd = socketserver.TCPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
@@ -351,13 +375,14 @@ def start_download_server(file_path, debug, custom_port, ip_addr):
     sys.exit()
 
 
-def start_upload_server(file_path, debug, custom_port, ip_addr):
+def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
     """
     Keyword Arguments:
     file_path        -- String indicating the path of the file to be uploaded
     debug            -- Boolean indication whether to output the encoded url
     custom_port      -- String indicating what custom port the user wants to use
     ip_addr          -- String indicating which IP address the user want to use
+    auth             -- String indicating base64 encoded username:password
     """
 
     if custom_port:
@@ -380,7 +405,7 @@ def start_upload_server(file_path, debug, custom_port, ip_addr):
         print("%s is not a folder." % file_path)
         return
 
-    handler = FileUploadServerHandlerClass(file_path)
+    handler = FileUploadServerHandlerClass(file_path, auth)
 
     try:
         httpd = socketserver.TCPServer(("", PORT), handler)
@@ -410,6 +435,12 @@ def start_upload_server(file_path, debug, custom_port, ip_addr):
 
     sys.exit()
 
+def b64_auth(a):
+    splited = a.split(':')
+    if len(splited) != 2:
+        msg = "The format of auth should be [username:password]"
+        raise argparse.ArgumentTypeError(msg)
+    return base64.b64encode(a.encode())
 
 def main():
     if operating_system != Windows:
@@ -424,13 +455,14 @@ def main():
     parser.add_argument('--receive', '-r', action="store_true", help="enable upload mode, received file will be stored at given path.")
     parser.add_argument('--port', '-p', dest="port", help="use a custom port")
     parser.add_argument('--ip_addr', dest="ip_addr", choices=get_local_ips_available(), help="specify IP address")
+    parser.add_argument('--auth', action="store", help="add authentication, format: username:password", type=b64_auth)
 
     args = parser.parse_args()
 
     if args.receive:
-        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr)
+        start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr, auth=args.auth)
     else:
-        start_download_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr)
+        start_download_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr, auth=args.auth)
 
 if __name__ == "__main__":
     main()
