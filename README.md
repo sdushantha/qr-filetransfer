@@ -8,8 +8,7 @@
 <p align="center">✨Transfer files over WiFi between your computer and your smartphone from the terminal✨</p>
 
 
-
-[![asciicast](https://asciinema.org/a/173861.svg)](https://asciinema.org/a/173861)
+<p align="center"><img src="http://giphygifs.s3.amazonaws.com/media/RdKsqWjGD20ubji5z6/giphy.gif"></p>
 
 ## Installation
 
