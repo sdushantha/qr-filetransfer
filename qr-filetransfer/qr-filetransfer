@@ -41,6 +41,35 @@ message = """
 """
 
 
+def cursor(status):
+    """
+    Enable and disable the cursor in the terminal
+
+    Keyword Arguments:
+    status    --  Boolean value for the status of the cursor
+    """
+    # If you dont understand how this one line if statement works, check out
+    # this link: https://stackoverflow.com/a/2802748/9215267
+    #
+    # Hide cursor: \033[?25h
+    # Enable cursor: \033[?25l 
+    [print("\033[?25h", end="") if status else print("\033[?25l", end="")]
+
+
+def clean_exit():
+    """
+    These are some things that need to be done before exiting so that the user
+    does have any problems after they have run qr-filetransfer
+    """
+
+    # Enable the cursor
+    cursor(True)
+
+    # Just being nice and not messing up your bash prompt :)
+    print()
+
+    sys.exit()
+
 def FileTransferServerHandlerClass(file_name, auth, debug):
 
     class FileTransferServerHandler(http.server.SimpleHTTPRequestHandler):
@@ -266,7 +295,7 @@ def get_local_ip():
         return s.getsockname()[0]
     except OSError:
         print("Network is unreachable")
-        sys.exit()
+        clean_exit()
 
 
 def get_local_ips_available():
@@ -349,7 +378,7 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
             delete_zip = file_path
         except PermissionError:
             print("Permission denied")
-            sys.exit()
+            clean_exit()
 
     # Tweaking file_path to make a perfect url
     file_path = file_path.replace(" ", "%20")
@@ -378,10 +407,8 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     # this deletes the first created zip
     if delete_zip != 0:
         os.remove(delete_zip)
-    # Just being nice and not messing up your bash prompt :)
-    print()
-
-    sys.exit()
+    
+    clean_exit()
 
 
 def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
@@ -420,7 +447,7 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
         httpd = socketserver.TCPServer(("", PORT), handler)
     except OSError:
         print(message)
-        sys.exit()
+        clean_exit()
 
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/"
@@ -439,11 +466,7 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
     except KeyboardInterrupt:
         pass
 
-    # Just being nice and not messing up your bash prompt :)
-    print()
-
-    sys.exit()
-
+    clean_exit()
 
 def b64_auth(a):
     splited = a.split(':')
@@ -458,6 +481,9 @@ def main():
         # SIGSTP does not work in Windows
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+
+    # We are disabling the cursor so that the output looks cleaner
+    cursor(False)
 
     parser = argparse.ArgumentParser(description="Transfer files over WiFi between your computer and your smartphone from the terminal")
 
