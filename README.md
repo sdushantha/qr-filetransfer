@@ -95,3 +95,5 @@ Inspired by the Go project [qr-filetransfer](https://github.com/claudiodangelis/
 MIT License
 
 Copyright © 2019 Siddharth Dushantha
+
+Active contributer - [Yu-Chen Lin](https://github.com/npes87184)
