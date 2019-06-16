@@ -65,8 +65,12 @@ def clean_exit():
     # Enable the cursor
     cursor(True)
 
-    # Just being nice and not messing up your bash prompt :)
-    print()
+    # Returning the cursor to home...
+    print("\r", end="")
+
+    # ...and printing "nothing" over it to hide ^C when
+    # CTRL+C is pressed
+    print("  ")
 
     sys.exit()
 
