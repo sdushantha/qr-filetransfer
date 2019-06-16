@@ -41,11 +41,12 @@ message = """
 """
 
 
-def FileTransferServerHandlerClass(file_name, auth):
+def FileTransferServerHandlerClass(file_name, auth, debug):
 
     class FileTransferServerHandler(http.server.SimpleHTTPRequestHandler):
         _file_name = file_name
         _auth = auth
+        _debug = debug
 
         def do_AUTHHEAD(self):
             self.send_response(401)
@@ -69,10 +70,14 @@ def FileTransferServerHandlerClass(file_name, auth):
             else:
                 super().do_GET()
 
+        def log_message(self, format, *args):
+            if self._debug:
+                super().log_message(format, *args)
+
     return FileTransferServerHandler
 
 
-def FileUploadServerHandlerClass(output_dir, auth):
+def FileUploadServerHandlerClass(output_dir, auth, debug):
 
     class FileUploadServerHandler(http.server.BaseHTTPRequestHandler):
         absolute_path = os.path.abspath(output_dir)
@@ -82,6 +87,7 @@ def FileUploadServerHandlerClass(output_dir, auth):
         nice_path = absolute_path.replace(home, "~")
         _output_dir = output_dir
         _auth = auth
+        _debug = debug
 
         def do_AUTHHEAD(self):
             self.send_response(401)
@@ -146,6 +152,9 @@ def FileUploadServerHandlerClass(output_dir, auth):
                 self.copyfile(f, self.wfile)
                 f.close()
 
+        def log_message(self, format, *args):
+            if self._debug:
+                super().log_message(format, *args)
 
         def deal_post_data(self):
             uploaded_files = []
@@ -345,7 +354,7 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     # Tweaking file_path to make a perfect url
     file_path = file_path.replace(" ", "%20")
 
-    handler = FileTransferServerHandlerClass(file_path, auth)
+    handler = FileTransferServerHandlerClass(file_path, auth, debug)
     httpd = socketserver.TCPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
@@ -405,7 +414,7 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
         print("%s is not a folder." % file_path)
         return
 
-    handler = FileUploadServerHandlerClass(file_path, auth)
+    handler = FileUploadServerHandlerClass(file_path, auth, debug)
 
     try:
         httpd = socketserver.TCPServer(("", PORT), handler)
