@@ -52,7 +52,7 @@ def cursor(status):
     # this link: https://stackoverflow.com/a/2802748/9215267
     #
     # Hide cursor: \033[?25h
-    # Enable cursor: \033[?25l 
+    # Enable cursor: \033[?25l
     [print("\033[?25h", end="") if status else print("\033[?25l", end="")]
 
 
@@ -411,7 +411,7 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     # this deletes the first created zip
     if delete_zip != 0:
         os.remove(delete_zip)
-    
+
     clean_exit()
 
 
