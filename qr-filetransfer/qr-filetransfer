@@ -52,7 +52,7 @@ def cursor(status):
     # this link: https://stackoverflow.com/a/2802748/9215267
     #
     # Hide cursor: \033[?25h
-    # Enable cursor: \033[?25l 
+    # Enable cursor: \033[?25l
     [print("\033[?25h", end="") if status else print("\033[?25l", end="")]
 
 
@@ -89,6 +89,7 @@ def FileTransferServerHandlerClass(file_name, auth, debug):
 
         def do_GET(self):
             if self._auth is not None:
+                # The authorization output will contain the prefix Basic, we should add it for comparing.
                 if self.headers.get('Authorization') != 'Basic ' + (self._auth.decode()):
                     self.do_AUTHHEAD()
                     return
@@ -130,6 +131,7 @@ def FileUploadServerHandlerClass(output_dir, auth, debug):
 
         def do_GET(self):
             if self._auth is not None:
+                # The authorization output will contain the prefix Basic, we should add it for comparing.
                 if self.headers.get('Authorization') != 'Basic ' + (self._auth.decode()):
                     self.do_AUTHHEAD()
                     return
@@ -148,8 +150,11 @@ def FileUploadServerHandlerClass(output_dir, auth, debug):
 
         def do_POST(self):
             """Serve a POST request."""
+            # First, we save the post data
             r, info = self.deal_post_data()
             print((r, info, "by: ", self.client_address))
+
+            # And write the response web page
             f = BytesIO()
             f.write(b"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\"><html>")
             f.write(b"<title>qr-filetransfer</title>")
@@ -194,8 +199,10 @@ def FileUploadServerHandlerClass(output_dir, auth, debug):
             content_type = self.headers['content-type']
             if not content_type:
                 return (False, "Content-Type header doesn't contain boundary")
+            # Get the boundary for splitting files
             boundary = content_type.split("=")[1].encode()
             remainbytes = int(self.headers['content-length'])
+            # Read first line, it should be boundary
             line = self.rfile.readline()
             remainbytes -= len(line)
 
@@ -209,8 +216,10 @@ def FileUploadServerHandlerClass(output_dir, auth, debug):
                     return (False, "Can't find out file name...")
                 file_name = fn[0]
                 fn = os.path.join(self._output_dir, file_name)
+                # Skip Content-Type
                 line = self.rfile.readline()
                 remainbytes -= len(line)
+                # Skip \r\n
                 line = self.rfile.readline()
                 remainbytes -= len(line)
                 try:
@@ -225,6 +234,7 @@ def FileUploadServerHandlerClass(output_dir, auth, debug):
                             line = self.rfile.readline()
                             remainbytes -= len(line)
                             if boundary in line:
+                                # Meets boundary, this file finished. We remove \r\n because of \r\n is introduced by protocol
                                 preline = preline[0:-1]
                                 if preline.endswith(b'\r'):
                                     preline = preline[0:-1]
@@ -232,6 +242,7 @@ def FileUploadServerHandlerClass(output_dir, auth, debug):
                                 uploaded_files.append(os.path.join(self.nice_path, file_name))
                                 break
                             else:
+                                # If not boundary, write it to output file directly.
                                 out.write(preline)
                                 preline = line
             return (True, "File '%s' upload success!" % ",".join(uploaded_files))
@@ -411,7 +422,7 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     # this deletes the first created zip
     if delete_zip != 0:
         os.remove(delete_zip)
-    
+
     clean_exit()
 
 
