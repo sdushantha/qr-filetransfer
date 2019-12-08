@@ -497,8 +497,6 @@ def main():
         # This disables CTRL+Z while the script is running
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-    # We are disabling the cursor so that the output looks cleaner
-    cursor(False)
 
     parser = argparse.ArgumentParser(description="Transfer files over WiFi between your computer and your smartphone from the terminal")
 
@@ -510,6 +508,9 @@ def main():
     parser.add_argument('--auth', action="store", help="add authentication, format: username:password", type=b64_auth)
 
     args = parser.parse_args()
+
+    # We are disabling the cursor so that the output looks cleaner
+    cursor(False)
 
     if args.receive:
         start_upload_server(file_path=args.file_path, debug=args.debug, custom_port=args.port, ip_addr=args.ip_addr, auth=args.auth)
