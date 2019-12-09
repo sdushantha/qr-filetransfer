@@ -296,7 +296,7 @@ def get_ssid():
     else:
         # List interface information and extract the SSID from Profile
         # note that if WiFi is not connected, Profile line will not be found and nothing will be returned.
-        interface_info = os.popen("netsh wlan show interfaces").read()
+        interface_info = os.popen("netsh.exe wlan show interfaces").read()
         for line in interface_info.splitlines():
             if line.strip().startswith("Profile"):
                 ssid = line.split(':')[1].strip()
