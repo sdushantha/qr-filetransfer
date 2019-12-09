@@ -52,7 +52,8 @@ def cursor(status):
     #
     # Hide cursor: \033[?25h
     # Enable cursor: \033[?25l
-    [print("\033[?25h", end="") if status else print("\033[?25l", end="")]
+    if operating_system != Windows:
+        print("\033[?25" + ("h" if status else "l"), end="")
 
 
 def clean_exit():
@@ -339,16 +340,10 @@ def print_qr_code(address):
     qr.add_data(address)
     qr.make()
 
-    if operating_system != Windows:
-        # According to gomercin on GitHub, print_tty
-        # prints out gibberish.
-        # print_tty() shows a better looking QR code.
-        # So thats why I am using print_tty() instead
-        # of print_ascii() for all operating systems
-        qr.print_tty()
-
-    else:
-        qr.print_ascii()
+    # print_tty() shows a better looking QR code.
+    # So that's why I am using print_tty() instead
+    # of print_ascii() for all operating systems
+    qr.print_tty()
 
 
 def start_download_server(file_path, debug, custom_port, ip_addr, auth):
@@ -516,6 +511,12 @@ def main():
     parser.add_argument('--auth', action="store", help="add authentication, format: username:password", type=b64_auth)
 
     args = parser.parse_args()
+
+    # For Windows, emulate support for ANSI escape sequences and clear the screen first
+    if operating_system == Windows:
+        import colorama
+        colorama.init()
+        print("\033[2J", end="")
 
     # We are disabling the cursor so that the output looks cleaner
     cursor(False)

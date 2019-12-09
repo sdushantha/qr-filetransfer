@@ -14,6 +14,6 @@ setuptools.setup(
     url='https://github.com/sdushantha/qr-filetransfer',
     packages=setuptools.find_packages(),
     scripts=['qr-filetransfer/qr-filetransfer'],
-    install_requires=['qrcode'],
+    install_requires=['qrcode', 'colorama; platform_system == "Windows"'],
     extras_require={'extras': ['netifaces']}
 )
