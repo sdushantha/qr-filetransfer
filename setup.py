@@ -14,5 +14,6 @@ setuptools.setup(
     url='https://github.com/sdushantha/qr-filetransfer',
     packages=setuptools.find_packages(),
     scripts=['qr-filetransfer/qr-filetransfer'],
-    install_requires=['netifaces', 'qrcode']
+    install_requires=['qrcode'],
+    extras_require={'extras': ['netifaces']}
 )

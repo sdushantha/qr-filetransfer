@@ -19,7 +19,6 @@ import urllib.parse
 import urllib.error
 import re
 from io import BytesIO
-import netifaces
 import qrcode
 import base64
 
@@ -315,12 +314,17 @@ def get_local_ip():
 
 def get_local_ips_available():
     """Get a list of all local IPv4 addresses except localhost"""
-    ips = []
-    for iface in netifaces.interfaces():
-        ips.extend([x["addr"] for x in netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) if x and "addr" in x])
+    try:
+        import netifaces
+        ips = []
+        for iface in netifaces.interfaces():
+            ips.extend([x["addr"] for x in netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) if x and "addr" in x])
 
-    localhost_ip = re.compile('^127.+$')
-    return [x for x in sorted(ips) if not localhost_ip.match(x)]
+        localhost_ip = re.compile('^127.+$')
+        return [x for x in sorted(ips) if not localhost_ip.match(x)]
+
+    except ModuleNotFoundError:
+        pass
 
 
 def random_port():
@@ -404,7 +408,9 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file_path
 
-    print("Scan the following QR code to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+    print("Scan the following QR code to start downloading.")
+    if SSID:
+        print("Make sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
 
     # There are many times where I just need to visit the url
     # and cant bother scaning the QR code everytime when debugging
@@ -467,7 +473,9 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/"
 
-    print("Scan the following QR code to start uploading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+    print("Scan the following QR code to start uploading.")
+    if SSID:
+        print("Make sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
 
     # There are many times where I just need to visit the url
     # and cant bother scaning the QR code everytime when debugging
