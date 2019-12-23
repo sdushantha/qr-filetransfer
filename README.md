@@ -18,11 +18,13 @@ You will find the most updated version of ```qr-filetransfer``` here. But if you
 
 Global Install
 
-```pip3 install qr-filetransfer```
+```pip3 install qr-filetransfer[extras]```
 
 Local Install
 
-```pip3 install --user qr-filetransfer```
+```pip3 install --user qr-filetransfer[extras]```
+
+If you run into problems during the install, try removing the optional `[extras]` at the end of the command.
 
 ### Git Install
 

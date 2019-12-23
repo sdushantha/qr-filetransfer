@@ -19,7 +19,6 @@ import urllib.parse
 import urllib.error
 import re
 from io import BytesIO
-import netifaces
 import qrcode
 import base64
 
@@ -53,7 +52,8 @@ def cursor(status):
     #
     # Hide cursor: \033[?25h
     # Enable cursor: \033[?25l
-    [print("\033[?25h", end="") if status else print("\033[?25l", end="")]
+    if operating_system != Windows:
+        print("\033[?25" + ("h" if status else "l"), end="")
 
 
 def clean_exit():
@@ -296,7 +296,7 @@ def get_ssid():
     else:
         # List interface information and extract the SSID from Profile
         # note that if WiFi is not connected, Profile line will not be found and nothing will be returned.
-        interface_info = os.popen("netsh wlan show interfaces").read()
+        interface_info = os.popen("netsh.exe wlan show interfaces").read()
         for line in interface_info.splitlines():
             if line.strip().startswith("Profile"):
                 ssid = line.split(':')[1].strip()
@@ -315,12 +315,17 @@ def get_local_ip():
 
 def get_local_ips_available():
     """Get a list of all local IPv4 addresses except localhost"""
-    ips = []
-    for iface in netifaces.interfaces():
-        ips.extend([x["addr"] for x in netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) if x and "addr" in x])
+    try:
+        import netifaces
+        ips = []
+        for iface in netifaces.interfaces():
+            ips.extend([x["addr"] for x in netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) if x and "addr" in x])
 
-    localhost_ip = re.compile('^127.+$')
-    return [x for x in sorted(ips) if not localhost_ip.match(x)]
+        localhost_ip = re.compile('^127.+$')
+        return [x for x in sorted(ips) if not localhost_ip.match(x)]
+
+    except ModuleNotFoundError:
+        pass
 
 
 def random_port():
@@ -335,16 +340,10 @@ def print_qr_code(address):
     qr.add_data(address)
     qr.make()
 
-    if operating_system != Windows:
-        # According to gomercin on GitHub, print_tty
-        # prints out gibberish.
-        # print_tty() shows a better looking QR code.
-        # So thats why I am using print_tty() instead
-        # of print_ascii() for all operating systems
-        qr.print_tty()
-
-    else:
-        qr.print_ascii()
+    # print_tty() shows a better looking QR code.
+    # So that's why I am using print_tty() instead
+    # of print_ascii() for all operating systems
+    qr.print_tty()
 
 
 def start_download_server(file_path, debug, custom_port, ip_addr, auth):
@@ -404,7 +403,9 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file_path
 
-    print("Scan the following QR code to start downloading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+    print("Scan the following QR code to start downloading.")
+    if SSID:
+        print("Make sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
 
     # There are many times where I just need to visit the url
     # and cant bother scaning the QR code everytime when debugging
@@ -467,7 +468,9 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/"
 
-    print("Scan the following QR code to start uploading.\nMake sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
+    print("Scan the following QR code to start uploading.")
+    if SSID:
+        print("Make sure that your smartphone is connected to \033[1;94m{}\033[0m".format(SSID))
 
     # There are many times where I just need to visit the url
     # and cant bother scaning the QR code everytime when debugging
@@ -508,6 +511,12 @@ def main():
     parser.add_argument('--auth', action="store", help="add authentication, format: username:password", type=b64_auth)
 
     args = parser.parse_args()
+
+    # For Windows, emulate support for ANSI escape sequences and clear the screen first
+    if operating_system == Windows:
+        import colorama
+        colorama.init()
+        print("\033[2J", end="")
 
     # We are disabling the cursor so that the output looks cleaner
     cursor(False)
