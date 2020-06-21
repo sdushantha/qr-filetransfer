@@ -370,7 +370,7 @@ def start_download_server(file_path, debug, custom_port, ip_addr, auth):
 
     if not os.path.exists(file_path):
         print("No such file or directory")
-        return
+        clean_exit()
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
@@ -451,11 +451,11 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
 
     if not os.path.exists(file_path):
         print("No such file or directory")
-        return
+        clean_exit()
 
     if not os.path.isdir(file_path):
         print("%s is not a folder." % file_path)
-        return
+        clean_exit()
 
     handler = FileUploadServerHandlerClass(file_path, auth, debug)
 
