@@ -62,6 +62,8 @@ optional arguments:
   --ip_addr {192.168.0.105}
                         specify IP address
   --auth AUTH           add authentication, format: username:password
+  --no-force-download   Allow browser to handle the file processing instead of
+                        forcing it to download.
 ```
 
 **Note:** Both devices needs to be connected to the same network
