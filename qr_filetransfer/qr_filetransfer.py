@@ -104,6 +104,17 @@ def FileTransferServerHandlerClass(file_name, auth, debug):
             else:
                 super().do_GET()
 
+        def guess_type(self, path):
+            """Always force download.
+
+            Args:
+                path: Placeholder that we're going to ignore.
+
+            Returns:
+                Content-Type as a string.
+            """
+            return "application/octet-stream"
+
         def log_message(self, format, *args):
             if self._debug:
                 super().log_message(format, *args)
