@@ -510,15 +510,15 @@ def start_upload_server(file_path, debug, custom_port, ip_addr, auth):
 
     SSID = get_ssid()
 
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path[0]):
         print("No such file or directory")
         clean_exit()
 
-    if not os.path.isdir(file_path):
-        print("%s is not a folder." % file_path)
+    if not os.path.isdir(file_path[0]):
+        print("%s is not a folder." % file_path[0])
         clean_exit()
 
-    handler = FileUploadServerHandlerClass(file_path, auth, debug)
+    handler = FileUploadServerHandlerClass(file_path[0], auth, debug)
 
     try:
         httpd = socketserver.TCPServer(("", PORT), handler)
