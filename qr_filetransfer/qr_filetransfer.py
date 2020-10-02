@@ -21,6 +21,7 @@ import re
 from io import BytesIO
 import qrcode
 import base64
+from zipfile import ZipFile
 
 
 MacOS = "Darwin"
@@ -406,21 +407,22 @@ def start_download_server(file_path, **kwargs):
             clean_exit()
 
 
-    # Variable to mark zip for deletion, if the user uses a folder as an argument 
+    # Variable to mark zip for deletion, if the user uses a folder as an argument
     delete_zip = 0
 
     # If single file
     if len(file_path) == 1 and not(os.path.isdir(file_path[0])):
         abs_path = os.path.normpath(os.path.abspath(file_path[0]))
         file_dir = os.path.dirname(abs_path)
-        file_path = os.path.basename(abs_path)
+        download_target_path = os.path.basename(abs_path)
+        #file_path = 
         # change to directory which contains file
         os.chdir(file_dir)
 
     # If multiple files
-    if type(file_path) is list and len(file_path) > 1:
+    elif type(file_path) is list and len(file_path) > 1:
         zip_name = "qr_filetransfer.zip"
-        #Zipping multiple files
+        # Zipping multiple files
         with ZipFile(zip_name, 'w') as zipObj2:
             for single_file_path in file_path:
                 abs_path = os.path.normpath(os.path.abspath(single_file_path))
@@ -429,32 +431,33 @@ def start_download_server(file_path, **kwargs):
                 os.chdir(file_dir)
                 # Add multiple files to the zip
                 zipObj2.write(single_file_path)
-        # Getting the last file abs_path and removing the name and concatinating with the zip_name    
+        # Getting the last file abs_path and
+        # removing the name and concatinating with the zip_name
         abs_path = os.path.normpath(os.path.abspath(zip_name))
         file_dir = os.path.dirname(abs_path)
         file_path = os.path.basename(abs_path)
-        file_path = file_path.replace(file_path, zip_name)
+        download_target_path = file_path.replace(file_path, zip_name)
 
-        delete_zip = file_path
+        delete_zip = download_target_path
 
-    # Checking if given file name or path is a directory
-    if os.path.isdir(file_path[0]):
+    # If given file name or path is a directory
+    else:
         zip_name = pathlib.PurePosixPath(file_path[0]).name
         try:
             # Zips the directory
             path_to_zip = make_archive(zip_name, "zip", file_path[0])
-            file_path = os.path.basename(path_to_zip)
-            delete_zip = file_path
+            download_target_path = os.path.basename(path_to_zip)
+            delete_zip = download_target_path
         except PermissionError:
             print("Permission denied")
             clean_exit()
 
 
-    # Tweaking file_path to make a perfect url
-    file_path = file_path.replace(" ", "%20")
+    # Tweaking download_target_path to make a perfect url
+    download_target_path = download_target_path.replace(" ", "%20")
 
     handler = FileTransferServerHandlerClass(
-        file_path,
+        download_target_path,
         auth,
         debug,
         kwargs.get("no_force_download", False)
@@ -462,7 +465,7 @@ def start_download_server(file_path, **kwargs):
     httpd = socketserver.TCPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
-    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file_path
+    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + download_target_path
 
     print("Scan the following QR code to start downloading.")
     if SSID:
