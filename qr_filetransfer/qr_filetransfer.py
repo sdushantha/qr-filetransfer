@@ -395,7 +395,7 @@ def start_download_server(file_path, **kwargs):
             instead of forcing the browser to download it.
     """
     PORT = int(kwargs["custom_port"]) if kwargs.get("custom_port") else random_port()
-    LOCAL_IP = kwargs["ip_addr"] if kwargs["ip_addr"] else get_local_ip()
+    LOCAL_IP = kwargs["ip_addr"] if kwargs.get("ip_addr") else get_local_ip()
     SSID = get_ssid()
     auth = kwargs.get("auth")
     debug = kwargs.get("debug", False)
