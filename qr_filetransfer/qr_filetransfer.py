@@ -128,7 +128,7 @@ def FileTransferServerHandlerClass(file_name, auth, debug, no_force_download):
             if not self._no_force_download:
                 return "application/octet-stream"
 
-            super().guess_type(path)
+            return super().guess_type(path)
 
         def log_message(self, format, *args):
             if self._debug:
