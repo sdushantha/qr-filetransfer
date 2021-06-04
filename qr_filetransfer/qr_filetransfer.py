@@ -428,7 +428,7 @@ def start_download_server(file_path, **kwargs):
             clean_exit()
 
     # Tweaking file_path to make a perfect url
-    file_path = file_path.replace(" ", "%20")
+    file_path = urllib.parse.quote(file_path)
 
     handler = FileTransferServerHandlerClass(
         file_path,
