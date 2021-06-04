@@ -112,9 +112,7 @@ def FileTransferServerHandlerClass(file_name, auth, debug, no_force_download):
             request_path = self.path[1:]
             if request_path != self._file_name:
                 # access denied
-                self.send_response(403)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
+                self.send_error(403)
             else:
                 super().do_GET()
 
