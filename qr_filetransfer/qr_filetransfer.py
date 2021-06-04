@@ -114,7 +114,10 @@ def FileTransferServerHandlerClass(file_name, auth, debug, no_force_download):
                 # access denied
                 self.send_error(403)
             else:
-                super().do_GET()
+                try:
+                    super().do_GET()
+                except ConnectionResetError:
+                    pass
 
         def guess_type(self, path):
             """Add ability to force download of files.
