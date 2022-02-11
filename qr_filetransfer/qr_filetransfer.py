@@ -52,7 +52,7 @@ def cursor(status):
     #
     # Hide cursor: \033[?25h
     # Enable cursor: \033[?25l
-    if operating_system != Windows:
+    if operating_system != Windows or 'WT_SESSION' in os.environ:
         print("\033[?25" + ("h" if status else "l"), end="")
 
 
@@ -555,11 +555,10 @@ def main():
 
     args = parser.parse_args()
 
-    # For Windows, emulate support for ANSI escape sequences and clear the screen first
-    if operating_system == Windows:
+    # For Windows, emulate support for ANSI escape sequences unless Windows Terminal is used
+    if operating_system == Windows and 'WT_SESSION' not in os.environ:
         import colorama
         colorama.init()
-        print("\033[2J", end="")
 
     # We are disabling the cursor so that the output looks cleaner
     cursor(False)
