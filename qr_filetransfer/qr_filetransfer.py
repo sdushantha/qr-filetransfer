@@ -112,11 +112,12 @@ def FileTransferServerHandlerClass(file_name, auth, debug, no_force_download):
             request_path = self.path[1:]
             if request_path != self._file_name:
                 # access denied
-                self.send_response(403)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
+                self.send_error(403)
             else:
-                super().do_GET()
+                try:
+                    super().do_GET()
+                except (ConnectionResetError, ConnectionAbortedError):
+                    pass
 
         def guess_type(self, path):
             """Add ability to force download of files.
@@ -130,7 +131,7 @@ def FileTransferServerHandlerClass(file_name, auth, debug, no_force_download):
             if not self._no_force_download:
                 return "application/octet-stream"
 
-            super().guess_type(path)
+            return super().guess_type(path)
 
         def log_message(self, format, *args):
             if self._debug:
@@ -362,7 +363,7 @@ def random_port():
 
 def print_qr_code(address):
     qr = qrcode.QRCode(version=1,
-                       error_correction=qrcode.constants.ERROR_CORRECT_L,
+                       error_correction=qrcode.ERROR_CORRECT_L,
                        box_size=10,
                        border=4,)
     qr.add_data(address)
@@ -395,7 +396,7 @@ def start_download_server(file_path, **kwargs):
             instead of forcing the browser to download it.
     """
     PORT = int(kwargs["custom_port"]) if kwargs.get("custom_port") else random_port()
-    LOCAL_IP = kwargs["ip_addr"] if kwargs["ip_addr"] else get_local_ip()
+    LOCAL_IP = kwargs["ip_addr"] if kwargs.get("ip_addr") else get_local_ip()
     SSID = get_ssid()
     auth = kwargs.get("auth")
     debug = kwargs.get("debug", False)
@@ -427,7 +428,7 @@ def start_download_server(file_path, **kwargs):
             clean_exit()
 
     # Tweaking file_path to make a perfect url
-    file_path = file_path.replace(" ", "%20")
+    file_path = urllib.parse.quote(file_path)
 
     handler = FileTransferServerHandlerClass(
         file_path,
